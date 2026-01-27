@@ -18,7 +18,7 @@ export default function Navbar() {
   const isActive = (path: string) => location.pathname === path
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-primary/10 backdrop-blur-md shadow-sm shadow-primary/4">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
