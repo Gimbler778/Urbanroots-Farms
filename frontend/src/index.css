@@ -14,6 +14,8 @@
     --primary-foreground: 0 0% 100%;
     --secondary: 30 40% 92%;
     --secondary-foreground: 140 30% 15%;
+    --earth-brown: 30 35% 55%;
+    --earth-brown-foreground: 0 0% 100%;
     --muted: 142 20% 96%;
     --muted-foreground: 140 10% 45%;
     --accent: 142 40% 88%;
@@ -37,6 +39,8 @@
     --primary-foreground: 0 0% 100%;
     --secondary: 30 20% 20%;
     --secondary-foreground: 0 0% 95%;
+    --earth-brown: 30 30% 48%;
+    --earth-brown-foreground: 0 0% 100%;
     --muted: 140 20% 20%;
     --muted-foreground: 140 10% 65%;
     --accent: 142 30% 25%;

@@ -16,17 +16,17 @@ export default function Footer() {
               Transforming urban spaces into sustainable farming solutions. Grow fresh, organic produce right in your building.
             </p>
             <div className="flex space-x-3">
-              <a href="#" className="p-2 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Facebook">
-                <Facebook className="w-4 h-4 text-primary" />
+              <a href="#" className="p-2 rounded-lg bg-primary/10 hover:bg-[hsl(var(--earth-brown))]/20 transition-colors" aria-label="Facebook">
+                <Facebook className="w-4 h-4 text-primary hover:text-[hsl(var(--earth-brown))] transition-colors" />
               </a>
-              <a href="#" className="p-2 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Twitter">
-                <Twitter className="w-4 h-4 text-primary" />
+              <a href="#" className="p-2 rounded-lg bg-primary/10 hover:bg-[hsl(var(--earth-brown))]/20 transition-colors" aria-label="Twitter">
+                <Twitter className="w-4 h-4 text-primary hover:text-[hsl(var(--earth-brown))] transition-colors" />
               </a>
-              <a href="#" className="p-2 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="Instagram">
-                <Instagram className="w-4 h-4 text-primary" />
+              <a href="#" className="p-2 rounded-lg bg-primary/10 hover:bg-[hsl(var(--earth-brown))]/20 transition-colors" aria-label="Instagram">
+                <Instagram className="w-4 h-4 text-primary hover:text-[hsl(var(--earth-brown))] transition-colors" />
               </a>
-              <a href="#" className="p-2 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors" aria-label="LinkedIn">
-                <Linkedin className="w-4 h-4 text-primary" />
+              <a href="#" className="p-2 rounded-lg bg-primary/10 hover:bg-[hsl(var(--earth-brown))]/20 transition-colors" aria-label="LinkedIn">
+                <Linkedin className="w-4 h-4 text-primary hover:text-[hsl(var(--earth-brown))] transition-colors" />
               </a>
             </div>
           </div>
@@ -36,22 +36,22 @@ export default function Footer() {
             <h3 className="font-semibold text-lg mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/about" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                <Link to="/about" className="text-sm text-muted-foreground hover:text-[hsl(var(--earth-brown))] transition-colors">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link to="/rent-a-pod" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                <Link to="/rent-a-pod" className="text-sm text-muted-foreground hover:text-[hsl(var(--earth-brown))] transition-colors">
                   Rent a Pod
                 </Link>
               </li>
               <li>
-                <Link to="/apply-for-building" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                <Link to="/apply-for-building" className="text-sm text-muted-foreground hover:text-[hsl(var(--earth-brown))] transition-colors">
                   Apply for Building
                 </Link>
               </li>
               <li>
-                <Link to="/refer-friend" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                <Link to="/refer-friend" className="text-sm text-muted-foreground hover:text-[hsl(var(--earth-brown))] transition-colors">
                   Refer a Friend
                 </Link>
               </li>
@@ -95,13 +95,13 @@ export default function Footer() {
               © 2026 UrbanRoots Farms. All rights reserved.
             </p>
             <div className="flex space-x-6 text-sm">
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+              <a href="#" className="text-muted-foreground hover:text-[hsl(var(--earth-brown))] transition-colors">
                 Privacy Policy
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+              <a href="#" className="text-muted-foreground hover:text-[hsl(var(--earth-brown))] transition-colors">
                 Terms of Service
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+              <a href="#" className="text-muted-foreground hover:text-[hsl(var(--earth-brown))] transition-colors">
                 Cookie Policy
               </a>
             </div>

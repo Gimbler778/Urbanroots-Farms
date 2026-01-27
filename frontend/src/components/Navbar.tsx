@@ -24,10 +24,13 @@ export default function Navbar() {
           {/* Logo */}
           <Link 
             to="/" 
-            className="flex items-end space-x-2 text-primary hover:opacity-80 transition-opacity"
+            className="flex items-end space-x-2 hover:opacity-80 transition-opacity"
           >
-            <UrbanRootsLogo className="w-12 h-12" />
-            <span className="text-xl font-bold pb-1">UrbanRoots</span>
+            <UrbanRootsLogo className="w-12 h-12 text-primary" />
+            <span className="text-xl font-bold pb-1">
+              <span className="text-primary">UrbanRoots</span>
+              <span className="text-[hsl(var(--earth-brown))]" style={{marginLeft: '0.25rem'}}>Farms</span>
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -40,7 +43,7 @@ export default function Navbar() {
                   "px-4 py-2 rounded-lg text-sm font-medium transition-all",
                   isActive(item.path)
                     ? "text-primary bg-primary/10"
-                    : "text-foreground/70 hover:text-primary hover:bg-primary/5"
+                    : "text-foreground/70 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10"
                 )}
               >
                 {item.name}
@@ -73,7 +76,7 @@ export default function Navbar() {
                   "block px-4 py-3 rounded-lg text-sm font-medium transition-all",
                   isActive(item.path)
                     ? "text-primary bg-primary/10"
-                    : "text-foreground/70 hover:text-primary hover:bg-primary/5"
+                    : "text-foreground/70 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10"
                 )}
               >
                 {item.name}

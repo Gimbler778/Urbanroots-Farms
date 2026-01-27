@@ -48,7 +48,7 @@ export default function HomePage() {
                 <Button 
                   variant="outline" 
                   size="lg" 
-                  className="text-lg px-8 py-6 rounded-xl border-2 hover:bg-primary/5"
+                  className="text-lg px-8 py-6 rounded-xl border-2 hover:bg-[hsl(var(--earth-brown))]/10 hover:border-[hsl(var(--earth-brown))]"
                 >
                   Learn More
                 </Button>
@@ -95,7 +95,7 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Feature Card 1 */}
-            <Card className="border-2 border-primary/20 hover:border-primary/40 transition-all hover:shadow-lg">
+            <Card className="border-2 border-primary/20 hover:border-[hsl(var(--earth-brown))]/60 transition-all hover:shadow-lg">
               <CardContent className="p-8 space-y-4">
                 <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Sprout className="w-7 h-7 text-primary" />
@@ -108,7 +108,7 @@ export default function HomePage() {
             </Card>
 
             {/* Feature Card 2 */}
-            <Card className="border-2 border-primary/20 hover:border-primary/40 transition-all hover:shadow-lg">
+            <Card className="border-2 border-primary/20 hover:border-[hsl(var(--earth-brown))]/60 transition-all hover:shadow-lg">
               <CardContent className="p-8 space-y-4">
                 <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Heart className="w-7 h-7 text-primary" />
@@ -121,7 +121,7 @@ export default function HomePage() {
             </Card>
 
             {/* Feature Card 3 */}
-            <Card className="border-2 border-primary/20 hover:border-primary/40 transition-all hover:shadow-lg">
+            <Card className="border-2 border-primary/20 hover:border-[hsl(var(--earth-brown))]/60 transition-all hover:shadow-lg">
               <CardContent className="p-8 space-y-4">
                 <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
                   <TrendingUp className="w-7 h-7 text-primary" />
@@ -134,7 +134,7 @@ export default function HomePage() {
             </Card>
 
             {/* Feature Card 4 */}
-            <Card className="border-2 border-primary/20 hover:border-primary/40 transition-all hover:shadow-lg">
+            <Card className="border-2 border-primary/20 hover:border-[hsl(var(--earth-brown))]/60 transition-all hover:shadow-lg">
               <CardContent className="p-8 space-y-4">
                 <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Users className="w-7 h-7 text-primary" />
@@ -147,7 +147,7 @@ export default function HomePage() {
             </Card>
 
             {/* Feature Card 5 */}
-            <Card className="border-2 border-primary/20 hover:border-primary/40 transition-all hover:shadow-lg">
+            <Card className="border-2 border-primary/20 hover:border-[hsl(var(--earth-brown))]/60 transition-all hover:shadow-lg">
               <CardContent className="p-8 space-y-4">
                 <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Shield className="w-7 h-7 text-primary" />
@@ -160,7 +160,7 @@ export default function HomePage() {
             </Card>
 
             {/* Feature Card 6 */}
-            <Card className="border-2 border-primary/20 hover:border-primary/40 transition-all hover:shadow-lg">
+            <Card className="border-2 border-primary/20 hover:border-[hsl(var(--earth-brown))]/60 transition-all hover:shadow-lg">
               <CardContent className="p-8 space-y-4">
                 <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Leaf className="w-7 h-7 text-primary" />
