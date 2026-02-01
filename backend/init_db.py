@@ -3,7 +3,7 @@ Database initialization script with sample data
 """
 from sqlalchemy.orm import Session
 from app.core.database import engine, Base, SessionLocal
-from app.models import Product
+from app.models import Product, User, Session as AuthSession, Account
 import uuid
 
 
@@ -11,6 +11,7 @@ def init_db():
     """Create database tables"""
     Base.metadata.create_all(bind=engine)
     print("✓ Database tables created")
+    print("✓ Auth tables (user, session, account, verification) created")
 
 
 def seed_data():

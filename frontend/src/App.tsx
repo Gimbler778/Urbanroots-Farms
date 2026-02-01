@@ -5,6 +5,9 @@ import AboutPage from './pages/AboutPage'
 import ApplyForBuildingPage from './pages/ApplyForBuildingPage'
 import ReferFriendPage from './pages/ReferFriendPage'
 import RentAPodPage from './pages/RentAPodPage'
+import SignInPage from './pages/SignInPage'
+import SignOutPage from './pages/SignOutPage'
+import VerifyEmailPage from './pages/VerifyEmailPage'
 
 function App() {
   return (
@@ -16,6 +19,9 @@ function App() {
           <Route path="/apply-for-building" element={<ApplyForBuildingPage />} />
           <Route path="/refer-friend" element={<ReferFriendPage />} />
           <Route path="/rent-a-pod" element={<RentAPodPage />} />
+          <Route path="/sign-in" element={<SignInPage />} />
+          <Route path="/sign-out" element={<SignOutPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
         </Routes>
       </Router>
     </ThemeProvider>

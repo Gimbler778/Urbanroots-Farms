@@ -9,15 +9,19 @@ class Settings(BaseSettings):
     debug: bool = True
     
     # Database
-    database_url: str = "sqlite:///./urbanroots.db"
+    # Default to PostgreSQL, fallback to SQLite for development
+    database_url: str = "postgresql://postgres:postgres@localhost:5432/urbanroots"
     
     # Security
     secret_key: str = "your-secret-key-here-change-in-production"
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
     
+    # Frontend URL for email links
+    frontend_url: str = "http://localhost:3001"
+    
     # CORS (will be parsed as comma-separated string from .env)
-    allowed_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
+    allowed_origins: str = "http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5173,http://localhost:3001,http://127.0.0.1:3001"
     
     model_config = SettingsConfigDict(
         env_file=".env",
