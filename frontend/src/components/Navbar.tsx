@@ -1,12 +1,15 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, User, LogOut, UserCircle2 } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import UrbanRootsLogo from './UrbanRootsLogo'
+import { useSession } from '@/lib/auth-client'
+import { Button } from './ui/button'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const location = useLocation()
+  const { data: session } = useSession()
 
   const navItems = [
     { name: 'About', path: '/about' },
@@ -49,6 +52,36 @@ export default function Navbar() {
                 {item.name}
               </Link>
             ))}
+            
+            {/* Auth Buttons */}
+            <div className="ml-4 flex items-center gap-2">
+              {session?.user ? (
+                <>
+                  <Link
+                    to="/sign-out"
+                    className={cn(
+                      "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
+                      "text-foreground/70 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10"
+                    )}
+                  >
+                    <UserCircle2 className="w-5 h-5" />
+                    <span>{session.user.name}</span>
+                    <LogOut className="w-4 h-4 ml-1" />
+                  </Link>
+                </>
+              ) : (
+                <Link
+                  to="/sign-in"
+                  className={cn(
+                    "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
+                    "text-foreground/70 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10"
+                  )}
+                >
+                  <User className="w-4 h-4" />
+                  <span>Sign In</span>
+                </Link>
+              )}
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
@@ -82,6 +115,38 @@ export default function Navbar() {
                 {item.name}
               </Link>
             ))}
+            
+            {/* Mobile Auth Links */}
+            <div className="border-t border-primary/20 pt-2 mt-2">
+              {session?.user ? (
+                <>
+                  <Link
+                    to="/sign-out"
+                    onClick={() => setIsOpen(false)}
+                    className={cn(
+                      "flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-all",
+                      "text-foreground/70 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10"
+                    )}
+                  >
+                    <UserCircle2 className="w-5 h-5" />
+                    <span>{session.user.name}</span>
+                    <LogOut className="w-4 h-4 ml-auto" />
+                  </Link>
+                </>
+              ) : (
+                <Link
+                  to="/sign-in"
+                  onClick={() => setIsOpen(false)}
+                  className={cn(
+                    "flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-all",
+                    "text-foreground/70 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10"
+                  )}
+                >
+                  <User className="w-4 h-4" />
+                  <span>Sign In</span>
+                </Link>
+              )}
+            </div>
           </div>
         )}
       </div>

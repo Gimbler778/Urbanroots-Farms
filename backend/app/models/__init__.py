@@ -5,6 +5,9 @@ import uuid
 from app.core.database import Base
 import enum
 
+# Import auth models
+from app.models.user import User, Session, Account, Verification
+
 
 class OrderStatus(str, enum.Enum):
     PENDING = "pending"
