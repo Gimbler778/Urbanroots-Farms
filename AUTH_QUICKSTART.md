@@ -5,6 +5,7 @@ Your UrbanRoots authentication system is ready! Here's how to get started.
 ## ✅ What's Been Set Up
 
 ### Backend (FastAPI + PostgreSQL)
+
 - ✅ Better Auth compatible authentication routes
 - ✅ User, Session, Account, and Verification database models
 - ✅ Password hashing with bcrypt
@@ -13,6 +14,7 @@ Your UrbanRoots authentication system is ready! Here's how to get started.
 - ✅ CORS configuration for frontend access
 
 ### Frontend (React + Better Auth)
+
 - ✅ Better Auth React client
 - ✅ Sign In / Sign Up page with toggle
 - ✅ Sign Out page with auto-redirect
@@ -30,6 +32,7 @@ createdb urbanroots
 ```
 
 Or using psql:
+
 ```sql
 CREATE DATABASE urbanroots;
 ```
@@ -117,11 +120,13 @@ npm run dev
 ## 📁 New Files Created
 
 ### Backend
+
 - `backend/app/models/user.py` - User, Session, Account, Verification models
 - `backend/app/api/routes/auth.py` - Authentication endpoints
 - `backend/.env.example` - Updated with PostgreSQL config
 
 ### Frontend
+
 - `frontend/src/lib/auth-client.ts` - Better Auth client setup
 - `frontend/src/pages/SignInPage.tsx` - Sign in/up page
 - `frontend/src/pages/SignOutPage.tsx` - Sign out page
@@ -129,6 +134,7 @@ npm run dev
 - `AUTH_SETUP.md` - Detailed documentation
 
 ### Updated Files
+
 - `backend/requirements.txt` - Added psycopg2-binary
 - `backend/app/core/config.py` - PostgreSQL default, added Vite ports to CORS
 - `backend/app/core/database.py` - Better connection handling
@@ -147,12 +153,12 @@ npm run dev
 
 ## 📚 API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/sign-up` | Create new user account |
-| POST | `/api/auth/sign-in/email` | Sign in with email/password |
-| POST | `/api/auth/sign-out` | Sign out and clear session |
-| GET | `/api/auth/session` | Get current session info |
+| Method | Endpoint                  | Description                 |
+| ------ | ------------------------- | --------------------------- |
+| POST   | `/api/auth/sign-up`       | Create new user account     |
+| POST   | `/api/auth/sign-in/email` | Sign in with email/password |
+| POST   | `/api/auth/sign-out`      | Sign out and clear session  |
+| GET    | `/api/auth/session`       | Get current session info    |
 
 ## 🛠️ Configuration Options
 
@@ -175,21 +181,25 @@ ALLOWED_ORIGINS=http://localhost:5173,https://yourdomain.com
 ## 🐛 Troubleshooting
 
 ### "Database connection failed"
+
 - Verify PostgreSQL is running: `pg_isready`
 - Check credentials in `.env`
 - Ensure database exists: `psql -l`
 
 ### "CORS error" in browser
+
 - Check frontend URL is in `ALLOWED_ORIGINS`
 - Restart backend after changing `.env`
 - Vite default port (5173) is already included
 
 ### "Module not found" errors
+
 - Backend: Make sure virtual environment is activated
 - Frontend: Run `npm install` again
 - Check you're in the correct directory
 
 ### Sessions not persisting
+
 - Check browser allows cookies
 - Verify cookie settings in browser DevTools
 - For production, enable HTTPS and set `secure=True`
@@ -197,6 +207,7 @@ ALLOWED_ORIGINS=http://localhost:5173,https://yourdomain.com
 ## 📖 Additional Documentation
 
 For more detailed information, see:
+
 - `AUTH_SETUP.md` - Complete authentication guide
 - `DOCUMENTATION.md` - General project documentation
 - API docs - `http://localhost:8000/docs` (when running)

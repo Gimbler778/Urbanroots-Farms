@@ -90,6 +90,7 @@ The frontend will be available at `http://localhost:5173`
 ### Authentication Endpoints
 
 #### Sign Up
+
 ```http
 POST /api/auth/sign-up
 Content-Type: application/json
@@ -102,6 +103,7 @@ Content-Type: application/json
 ```
 
 #### Sign In
+
 ```http
 POST /api/auth/sign-in/email
 Content-Type: application/json
@@ -113,11 +115,13 @@ Content-Type: application/json
 ```
 
 #### Sign Out
+
 ```http
 POST /api/auth/sign-out
 ```
 
 #### Get Session
+
 ```http
 GET /api/auth/session
 ```
@@ -125,6 +129,7 @@ GET /api/auth/session
 ## Database Schema
 
 ### User Table
+
 - `id`: String (Primary Key)
 - `name`: String
 - `email`: String (Unique)
@@ -134,6 +139,7 @@ GET /api/auth/session
 - `updatedAt`: DateTime
 
 ### Session Table
+
 - `id`: String (Primary Key)
 - `userId`: String (Foreign Key)
 - `expiresAt`: DateTime
@@ -143,6 +149,7 @@ GET /api/auth/session
 - `updatedAt`: DateTime
 
 ### Account Table
+
 - `id`: String (Primary Key)
 - `accountId`: String
 - `providerId`: String
