@@ -9,8 +9,9 @@ class User(Base):
     id = Column(String, primary_key=True, index=True)
     name = Column(String, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
+    image= Column(String, nullable=True)
+    passwordHash = Column(String, nullable=False)
     emailVerified = Column(Boolean, default=False)
-    image = Column(String, nullable=True)
     createdAt = Column(DateTime(timezone=True), server_default=func.now())
     updatedAt = Column(DateTime(timezone=True), onupdate=func.now())
 

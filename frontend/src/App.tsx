@@ -7,7 +7,8 @@ import ReferFriendPage from './pages/ReferFriendPage'
 import RentAPodPage from './pages/RentAPodPage'
 import SignInPage from './pages/SignInPage'
 import SignOutPage from './pages/SignOutPage'
-import VerifyEmailPage from './pages/VerifyEmailPage'
+import VerifyEmail from './pages/VerifyEmail'
+import ForgotPassword from './pages/ForgotPassword'
 
 function App() {
   return (
@@ -21,7 +22,8 @@ function App() {
           <Route path="/rent-a-pod" element={<RentAPodPage />} />
           <Route path="/sign-in" element={<SignInPage />} />
           <Route path="/sign-out" element={<SignOutPage />} />
-          <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
         </Routes>
       </Router>
     </ThemeProvider>
