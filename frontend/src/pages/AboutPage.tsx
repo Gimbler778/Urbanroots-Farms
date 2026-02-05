@@ -5,7 +5,6 @@ import { Card, CardContent } from '@/components/ui/card'
 export default function AboutPage() {
   return (
     <Layout>
-      {/* Hero Section */}
       <section className="relative py-20 bg-gradient-to-b from-primary/10 to-background">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center space-y-6">
@@ -24,7 +23,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Mission & Vision */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12">
@@ -55,7 +53,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Our Story */}
       <section className="py-20 bg-primary/5">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto space-y-8">
@@ -80,7 +77,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Core Values */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
@@ -130,7 +126,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Impact Stats */}
       <section className="py-20 bg-gradient-to-b from-primary/5 to-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">

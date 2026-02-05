@@ -4,15 +4,15 @@ from app.core.config import settings
 from app.core.database import engine, Base
 from app.api.routes import products, orders, auth
 
-# Create database tables
-Base.metadata.create_all(bind=engine)
-
 app = FastAPI(
     title=settings.app_name,
     debug=settings.debug
 )
 
-# Configure CORS
+@app.on_event("startup")
+def startup():
+    Base.metadata.create_all(bind=engine)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.get_allowed_origins(),
@@ -21,11 +21,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
 app.include_router(products.router, prefix="/api")
 app.include_router(orders.router, prefix="/api")
-app.include_router(auth.router, prefix="/api")
-
+app.include_router(auth.router)
 
 @app.get("/")
 def root():
@@ -35,12 +33,6 @@ def root():
         "docs": "/docs"
     }
 
-
 @app.get("/health")
 def health_check():
     return {"status": "healthy"}
-
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
