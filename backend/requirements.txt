@@ -9,4 +9,4 @@ passlib[bcrypt]==1.7.4
 python-multipart==0.0.12
 python-dotenv==1.0.1
 psycopg[binary]==3.2.3
-
+fastapi-mail==1.4.1
