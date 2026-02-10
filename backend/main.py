@@ -1,38 +1,39 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.database import engine, Base
-from app.api.routes import products, orders, auth
+from app.api.routes import auth, products, orders
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    Base.metadata.create_all(bind=engine)
+    yield
+    # Shutdown (if needed)
+    # Add cleanup code here
 
 app = FastAPI(
-    title=settings.app_name,
-    debug=settings.debug
+    title="UrbanRoots API",
+    description="API for UrbanRoots platform",
+    version="1.0.0",
+    lifespan=lifespan
 )
 
-@app.on_event("startup")
-def startup():
-    Base.metadata.create_all(bind=engine)
-
+# CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.get_allowed_origins(),
+    allow_origins=settings.allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-app.include_router(products.router, prefix="/api")
-app.include_router(orders.router, prefix="/api")
-app.include_router(auth.router)
+# Include routers
+app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
+app.include_router(products.router, prefix="/api/products", tags=["products"])
+app.include_router(orders.router, prefix="/api/orders", tags=["orders"])
 
 @app.get("/")
-def root():
-    return {
-        "message": "Welcome to UrbanRoots API",
-        "version": "1.0.0",
-        "docs": "/docs"
-    }
-
-@app.get("/health")
-def health_check():
-    return {"status": "healthy"}
+async def root():
+    return {"message": "Welcome to UrbanRoots API"}

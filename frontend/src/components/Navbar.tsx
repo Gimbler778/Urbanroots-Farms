@@ -1,18 +1,23 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, User, LogOut, UserCircle2 } from 'lucide-react'
+import { Menu, X, User, LogOut, UserCircle2, ShoppingCart } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import UrbanRootsLogo from './UrbanRootsLogo'
 import { useSession } from '@/lib/auth-client'
-import { Button } from './ui/button'
+import { Badge } from './ui/badge'
+import { useCart } from '@/contexts/CartContext'
+
+const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const location = useLocation()
   const { data: session } = useSession()
+  const { getCartItemsCount } = useCart()
 
   const navItems = [
     { name: 'About', path: '/about' },
+    { name: 'Products', path: '/products' },
     { name: 'Apply for My Building', path: '/apply-for-building' },
     { name: 'Refer to a Friend', path: '/refer-friend' },
     { name: 'Rent a Pod', path: '/rent-a-pod' },
@@ -27,6 +32,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link 
             to="/" 
+            onClick={scrollToTop}
             className="flex items-end space-x-2 hover:opacity-80 transition-opacity"
           >
             <UrbanRootsLogo className="w-12 h-12 text-primary" />
@@ -42,6 +48,7 @@ export default function Navbar() {
               <Link
                 key={item.path}
                 to={item.path}
+                onClick={scrollToTop}
                 className={cn(
                   "px-4 py-2 rounded-lg text-sm font-medium transition-all",
                   isActive(item.path)
@@ -52,6 +59,28 @@ export default function Navbar() {
                 {item.name}
               </Link>
             ))}
+            
+            {/* Cart Icon */}
+            <Link
+              to="/cart"
+              onClick={scrollToTop}
+              className={cn(
+                "relative px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2",
+                isActive('/cart')
+                  ? "text-primary bg-primary/10"
+                  : "text-foreground/70 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10"
+              )}
+            >
+              <ShoppingCart className="w-5 h-5" />
+              {getCartItemsCount() > 0 && (
+                <Badge 
+                  variant="destructive" 
+                  className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center rounded-full p-0 text-xs"
+                >
+                  {getCartItemsCount()}
+                </Badge>
+              )}
+            </Link>
             
             {/* Auth Buttons */}
             <div className="ml-4 flex items-center gap-2">
@@ -104,7 +133,7 @@ export default function Navbar() {
               <Link
                 key={item.path}
                 to={item.path}
-                onClick={() => setIsOpen(false)}
+                onClick={() => { setIsOpen(false); scrollToTop(); }}
                 className={cn(
                   "block px-4 py-3 rounded-lg text-sm font-medium transition-all",
                   isActive(item.path)
@@ -115,6 +144,29 @@ export default function Navbar() {
                 {item.name}
               </Link>
             ))}
+            
+            {/* Mobile Cart Link */}
+            <Link
+              to="/cart"
+              onClick={() => { setIsOpen(false); scrollToTop(); }}
+              className={cn(
+                "flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-all relative",
+                isActive('/cart')
+                  ? "text-primary bg-primary/10"
+                  : "text-foreground/70 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10"
+              )}
+            >
+              <ShoppingCart className="w-5 h-5" />
+              <span>Cart</span>
+              {getCartItemsCount() > 0 && (
+                <Badge 
+                  variant="destructive" 
+                  className="ml-auto h-5 w-5 flex items-center justify-center rounded-full p-0 text-xs"
+                >
+                  {getCartItemsCount()}
+                </Badge>
+              )}
+            </Link>
             
             {/* Mobile Auth Links */}
             <div className="border-t border-primary/20 pt-2 mt-2">

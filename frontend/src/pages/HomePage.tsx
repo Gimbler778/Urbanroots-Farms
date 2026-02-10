@@ -1,64 +1,33 @@
 import { Link } from 'react-router-dom'
 import Layout from '@/components/Layout'
-import { Leaf, Sprout, Heart, TrendingUp, Users, Shield, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Leaf, Sprout, Heart, TrendingUp, Users, Shield, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { useRef, useState, useEffect } from 'react'
+
+const features = [
+  { icon: Sprout, title: '100% Organic', desc: 'Grow pesticide-free, organic produce using sustainable farming practices and natural nutrients.' },
+  { icon: Heart, title: 'Farm to Table', desc: 'Harvest fresh vegetables and herbs directly from your building. Maximum freshness, minimal carbon footprint.' },
+  { icon: TrendingUp, title: 'Cost Effective', desc: 'Reduce grocery expenses while enjoying premium organic produce. Smart investment in health and sustainability.' },
+  { icon: Users, title: 'Community Building', desc: 'Foster community engagement through shared farming experiences and healthy living initiatives.' },
+  { icon: Shield, title: 'Full Support', desc: 'Expert guidance, maintenance services, and 24/7 support to ensure your farm thrives year-round.' },
+  { icon: Leaf, title: 'Eco-Friendly', desc: 'Reduce environmental impact with water-efficient systems and zero-waste farming practices.' },
+]
+
+function FeatureCard({ icon: Icon, title, desc }: { icon: React.ElementType; title: string; desc: string }) {
+  return (
+    <Card className="w-[280px] min-w-[280px] max-w-[280px] flex-shrink-0 border-2 border-primary/20 hover:border-[hsl(var(--earth-brown))]/60 transition-all duration-300 hover:shadow-2xl hover:scale-[1.05] hover:-translate-y-2 rounded-2xl">
+      <CardContent className="p-6 space-y-3">
+        <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+          <Icon className="w-6 h-6 text-primary" />
+        </div>
+        <h3 className="text-lg font-bold">{title}</h3>
+        <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
+      </CardContent>
+    </Card>
+  )
+}
 
 export default function HomePage() {
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const [canScrollLeft, setCanScrollLeft] = useState(false)
-  const [canScrollRight, setCanScrollRight] = useState(true)
-  const [isPaused, setIsPaused] = useState(false)
-
-  const checkScroll = () => {
-    if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current
-      setCanScrollLeft(scrollLeft > 0)
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10)
-    }
-  }
-
-  const scroll = (direction: 'left' | 'right') => {
-    if (scrollContainerRef.current) {
-      const scrollAmount = 400
-      scrollContainerRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth'
-      })
-    }
-  }
-
-  const autoScroll = () => {
-    if (scrollContainerRef.current && !isPaused) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current
-      
-      // If reached the end, scroll back to start
-      if (scrollLeft >= scrollWidth - clientWidth - 10) {
-        scrollContainerRef.current.scrollTo({ left: 0, behavior: 'smooth' })
-      } else {
-        scrollContainerRef.current.scrollBy({ left: 2, behavior: 'auto' })
-      }
-    }
-  }
-
-  useEffect(() => {
-    checkScroll()
-    const container = scrollContainerRef.current
-    if (container) {
-      container.addEventListener('scroll', checkScroll)
-      window.addEventListener('resize', checkScroll)
-      
-      // Auto-scroll interval
-      const intervalId = setInterval(autoScroll, 30)
-      
-      return () => {
-        container.removeEventListener('scroll', checkScroll)
-        window.removeEventListener('resize', checkScroll)
-        clearInterval(intervalId)
-      }
-    }
-  }, [isPaused])
   return (
     <Layout>
       {/* Hero Section */}
@@ -147,117 +116,21 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Carousel Container */}
-          <div 
-            className="relative group py-12 -mx-4 px-4"
-            onMouseEnter={() => setIsPaused(true)}
-            onMouseLeave={() => setIsPaused(false)}
-          >
-            {/* Left Arrow */}
-            {canScrollLeft && (
-              <button
-                onClick={() => scroll('left')}
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-background/90 hover:bg-background shadow-lg rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                aria-label="Scroll left"
-              >
-                <ChevronLeft className="w-6 h-6 text-primary" />
-              </button>
-            )}
-
-            {/* Right Arrow */}
-            {canScrollRight && (
-              <button
-                onClick={() => scroll('right')}
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-background/90 hover:bg-background shadow-lg rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                aria-label="Scroll right"
-              >
-                <ChevronRight className="w-6 h-6 text-primary" />
-              </button>
-            )}
-
-            {/* Scrollable Cards Container */}
-            <div 
-              ref={scrollContainerRef}
-              className="flex overflow-x-auto overflow-y-visible gap-8 px-6 py-6 scrollbar-hide"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            >
-              {/* Feature Card 1 */}
-              <Card className="min-w-[320px] md:min-w-[380px] flex-shrink-0 border-2 border-primary/20 hover:border-[hsl(var(--earth-brown))]/60 transition-all duration-300 hover:shadow-2xl hover:scale-[1.08] hover:-translate-y-2">
-                <CardContent className="p-8 space-y-4">
-                  <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Sprout className="w-7 h-7 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-bold">100% Organic</h3>
-                  <p className="text-muted-foreground">
-                    Grow pesticide-free, organic produce using sustainable farming practices and natural nutrients.
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Feature Card 2 */}
-              <Card className="min-w-[320px] md:min-w-[380px] flex-shrink-0 border-2 border-primary/20 hover:border-[hsl(var(--earth-brown))]/60 transition-all duration-300 hover:shadow-2xl hover:scale-[1.08] hover:-translate-y-2">
-                <CardContent className="p-8 space-y-4">
-                  <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Heart className="w-7 h-7 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-bold">Farm to Table</h3>
-                  <p className="text-muted-foreground">
-                    Harvest fresh vegetables and herbs directly from your building. Maximum freshness, minimal carbon footprint.
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Feature Card 3 */}
-              <Card className="min-w-[320px] md:min-w-[380px] flex-shrink-0 border-2 border-primary/20 hover:border-[hsl(var(--earth-brown))]/60 transition-all duration-300 hover:shadow-2xl hover:scale-[1.08] hover:-translate-y-2">
-                <CardContent className="p-8 space-y-4">
-                  <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <TrendingUp className="w-7 h-7 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-bold">Cost Effective</h3>
-                  <p className="text-muted-foreground">
-                    Reduce grocery expenses while enjoying premium organic produce. Smart investment in health and sustainability.
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Feature Card 4 */}
-              <Card className="min-w-[320px] md:min-w-[380px] flex-shrink-0 border-2 border-primary/20 hover:border-[hsl(var(--earth-brown))]/60 transition-all duration-300 hover:shadow-2xl hover:scale-[1.08] hover:-translate-y-2">
-                <CardContent className="p-8 space-y-4">
-                  <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Users className="w-7 h-7 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-bold">Community Building</h3>
-                  <p className="text-muted-foreground">
-                    Foster community engagement through shared farming experiences and healthy living initiatives.
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Feature Card 5 */}
-              <Card className="min-w-[320px] md:min-w-[380px] flex-shrink-0 border-2 border-primary/20 hover:border-[hsl(var(--earth-brown))]/60 transition-all duration-300 hover:shadow-2xl hover:scale-[1.08] hover:-translate-y-2">
-                <CardContent className="p-8 space-y-4">
-                  <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Shield className="w-7 h-7 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-bold">Full Support</h3>
-                  <p className="text-muted-foreground">
-                    Expert guidance, maintenance services, and 24/7 support to ensure your farm thrives year-round.
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Feature Card 6 */}
-              <Card className="min-w-[320px] md:min-w-[380px] flex-shrink-0 border-2 border-primary/20 hover:border-[hsl(var(--earth-brown))]/60 transition-all duration-300 hover:shadow-2xl hover:scale-[1.08] hover:-translate-y-2">
-                <CardContent className="p-8 space-y-4">
-                  <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Leaf className="w-7 h-7 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-bold">Eco-Friendly</h3>
-                  <p className="text-muted-foreground">
-                    Reduce environmental impact with water-efficient systems and zero-waste farming practices.
-                  </p>
-                </CardContent>
-              </Card>
+          {/* Infinite Marquee */}
+          <div className="relative py-8 overflow-hidden group">
+            <div className="flex w-max animate-marquee group-hover:[animation-play-state:paused] py-4">
+              {/* First set */}
+              <div className="flex gap-6 px-3">
+                {features.map((f, i) => (
+                  <FeatureCard key={`a-${i}`} icon={f.icon} title={f.title} desc={f.desc} />
+                ))}
+              </div>
+              {/* Duplicate set for seamless loop */}
+              <div className="flex gap-6 px-3">
+                {features.map((f, i) => (
+                  <FeatureCard key={`b-${i}`} icon={f.icon} title={f.title} desc={f.desc} />
+                ))}
+              </div>
             </div>
           </div>
         </div>
