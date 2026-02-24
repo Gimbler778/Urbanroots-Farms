@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Layout from '@/components/Layout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -17,6 +17,10 @@ const ITEMS_PER_PAGE = 10;
 export default function ProductsPage() {
   const [equipmentPage, setEquipmentPage] = useState(1);
   const [servicesPage, setServicesPage] = useState(1);
+  const [activeTab, setActiveTab] = useState<'equipment' | 'services'>('equipment');
+
+  const equipmentGridRef = useRef<HTMLDivElement | null>(null);
+  const servicesGridRef = useRef<HTMLDivElement | null>(null);
 
   const equipmentTotalPages = Math.ceil(equipmentData.length / ITEMS_PER_PAGE);
   const servicesTotalPages = Math.ceil(servicesData.length / ITEMS_PER_PAGE);
@@ -27,10 +31,34 @@ export default function ProductsPage() {
     return data.slice(startIndex, endIndex);
   };
 
-  const handlePageChange = (page: number, setter: (page: number) => void) => {
-    setter(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const scrollToTop = () => {
+    // Defer to next frame so new items render before scroll
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
   };
+
+  const scrollToFirstCard = (tab: 'equipment' | 'services') => {
+    const el = tab === 'equipment' ? equipmentGridRef.current : servicesGridRef.current;
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      scrollToTop();
+    }
+  };
+
+  const handlePageChange = (
+    page: number,
+    setter: (page: number) => void,
+    tab: 'equipment' | 'services'
+  ) => {
+    setter(page);
+    requestAnimationFrame(() => scrollToFirstCard(tab));
+  };
+
+  useEffect(() => {
+    requestAnimationFrame(() => scrollToFirstCard(activeTab));
+  }, [equipmentPage, servicesPage, activeTab]);
 
   const renderPagination = (
     currentPage: number,
@@ -82,13 +110,17 @@ export default function ProductsPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="equipment" className="w-full">
+      <Tabs
+        value={activeTab}
+        onValueChange={(v) => setActiveTab(v as 'equipment' | 'services')}
+        className="w-full"
+      >
         <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
           <TabsTrigger value="equipment" className="text-lg">
-            🛠️ Equipment
+             Equipment
           </TabsTrigger>
           <TabsTrigger value="services" className="text-lg">
-            ⚙️ Services
+            Services
           </TabsTrigger>
         </TabsList>
 
@@ -100,13 +132,16 @@ export default function ProductsPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+          <div
+            ref={equipmentGridRef}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6"
+          >
             {getPaginatedProducts(equipmentData, equipmentPage).map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
 
-          {renderPagination(equipmentPage, equipmentTotalPages, (p) => handlePageChange(p, setEquipmentPage))}
+          {renderPagination(equipmentPage, equipmentTotalPages, (p) => handlePageChange(p, setEquipmentPage, 'equipment'))}
         </TabsContent>
 
         <TabsContent value="services" className="mt-6">
@@ -117,13 +152,16 @@ export default function ProductsPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+          <div
+            ref={servicesGridRef}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6"
+          >
             {getPaginatedProducts(servicesData, servicesPage).map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
 
-          {renderPagination(servicesPage, servicesTotalPages, (p) => handlePageChange(p, setServicesPage))}
+          {renderPagination(servicesPage, servicesTotalPages, (p) => handlePageChange(p, setServicesPage, 'services'))}
         </TabsContent>
       </Tabs>
     </div>

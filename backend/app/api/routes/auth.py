@@ -321,7 +321,7 @@ import secrets
 import random
 import bcrypt
 from datetime import datetime, timedelta, timezone
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Response, status
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Request, Response, status
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
@@ -329,7 +329,7 @@ from app.core.database import get_db
 from app.core.config import settings
 from app.models import User, Verification, Session as AuthSession
 
-router = APIRouter(prefix="/api/auth", tags=["auth"])
+router = APIRouter(tags=["auth"])
 
 conf = ConnectionConfig(
     MAIL_USERNAME=settings.mail_username,
@@ -643,7 +643,105 @@ async def sign_in(
             "email": user.email,
         }
     }
-   
+
+
+@router.get("/get-session")
+async def get_session(
+    request: Request,
+    db: Session = Depends(get_db)
+):
+    session_token = request.cookies.get("better-auth.session_token")
+
+    if not session_token:
+        return {"session": None, "user": None}
+
+    session = db.query(AuthSession).filter(AuthSession.id == session_token).first()
+
+    if not session or session.expiresAt < datetime.now(timezone.utc):
+        return {"session": None, "user": None}
+
+    user = db.query(User).filter(User.id == session.userId).first()
+
+    if not user:
+        return {"session": None, "user": None}
+
+    return {
+        "session": {
+            "id": session.id,
+            "userId": session.userId,
+            "expiresAt": session.expiresAt.isoformat(),
+        },
+        "user": {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "emailVerified": user.emailVerified,
+            "image": user.image,
+            "bio": getattr(user, 'bio', None),
+            "avatarSeed": getattr(user, 'avatarSeed', None),
+        }
+    }
+
+
+class UpdateProfileRequest(BaseModel):
+    bio: str | None = None
+    avatarSeed: str | None = None
+
+
+@router.put("/update-profile")
+async def update_profile(
+    data: UpdateProfileRequest,
+    request: Request,
+    db: Session = Depends(get_db)
+):
+    session_token = request.cookies.get("better-auth.session_token")
+    if not session_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    session = db.query(AuthSession).filter(AuthSession.id == session_token).first()
+    if not session or session.expiresAt < datetime.now(timezone.utc):
+        raise HTTPException(status_code=401, detail="Session expired")
+
+    user = db.query(User).filter(User.id == session.userId).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if data.bio is not None:
+        user.bio = data.bio
+    if data.avatarSeed is not None:
+        user.avatarSeed = data.avatarSeed
+
+    db.commit()
+    db.refresh(user)
+
+    return {
+        "message": "Profile updated",
+        "user": {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "bio": user.bio,
+            "avatarSeed": user.avatarSeed,
+        }
+    }
+
+
+@router.post("/sign-out")
+async def sign_out(
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db)
+):
+    session_token = request.cookies.get("better-auth.session_token")
+    if session_token:
+        session = db.query(AuthSession).filter(AuthSession.id == session_token).first()
+        if session:
+            db.delete(session)
+            db.commit()
+    response.delete_cookie(key="better-auth.session_token")
+    return {"success": True}
+
+
 @router.post("/forgot-password-email")
 async def forgot_password_email(
     data: ResendOTPRequest,  
