@@ -15,9 +15,11 @@ import eyeopen from '../assets/eye_open.png'
 import eyeclosed from '../assets/eye-close.svg'
 import axios from 'axios'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useAuth } from '@/hooks/useAuth'
 
 export default function SignInPage() {
   const navigate = useNavigate()
+  const { refreshSession } = useAuth()
 
   const [isSignUp, setIsSignUp] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -52,7 +54,7 @@ export default function SignInPage() {
     setError("")
     setLoading(true)
 
-    const API_BASE = "http://127.0.0.1:8000/api/auth"
+    const API_BASE = "http://localhost:8000/api/auth"
 
     try {
       if (isSignUp) {
@@ -77,7 +79,8 @@ export default function SignInPage() {
         )
 
         if (response.data.user) {
-          navigate("/dashboard")
+          await refreshSession()
+          navigate("/")
         }
       }
     } catch (err: any) {

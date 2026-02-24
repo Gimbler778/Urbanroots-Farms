@@ -5,9 +5,11 @@ import Layout from "../components/Layout"
 import { Button } from "../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import axios from "axios"
+import { useAuth } from "@/hooks/useAuth"
 
 export default function VerifyEmail() {
   const navigate = useNavigate()
+  const { refreshSession } = useAuth()
   const location = useLocation()
   const email = location.state?.email
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
@@ -16,7 +18,7 @@ export default function VerifyEmail() {
   const [loading, setLoading] = useState(false)
   const [timer, setTimer] = useState(30)
   const [canResend, setCanResend] = useState(false)
-  const API_BASE = "http://127.0.0.1:8000/api/auth"
+  const API_BASE = "http://localhost:8000/api/auth"
 
   useEffect(() => {
     if (!email) navigate("/signin")
@@ -72,7 +74,8 @@ export default function VerifyEmail() {
       )
 
       if (response.data.status === "success") {
-        navigate("/dashboard")
+        await refreshSession()
+        navigate("/")
       }
 
     } catch (err: any) {

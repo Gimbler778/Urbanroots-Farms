@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react"
 import axios from "axios"
-import { redirect, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import Layout from "../components/Layout"
 import { Button } from "../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
@@ -8,7 +8,7 @@ import eyeopen from "../assets/eye_open.png"
 import eyeclosed from "../assets/eye-close.svg"
 
 export default function ForgotPassword() {
-    const API_BASE = "http://127.0.0.1:8000/api/auth"
+    const API_BASE = "http://localhost:8000/api/auth"
     const navigate = useNavigate()
     const [step, setStep] = useState(1)
     const [email, setEmail] = useState("")
@@ -252,6 +252,7 @@ export default function ForgotPassword() {
                                     />
                                     <img
                                         src={showPassword ? eyeopen : eyeclosed}
+                                        alt="Toggle password visibility"
                                         className="absolute right-3 top-3 w-5 cursor-pointer"
                                         onClick={() => setShowPassword(!showPassword)}
                                     />
@@ -267,6 +268,7 @@ export default function ForgotPassword() {
                                     />
                                     <img
                                         src={showConfirmPassword ? eyeopen : eyeclosed}
+                                        alt="Toggle password visibility"
                                         className="absolute right-3 top-3 w-5 cursor-pointer"
                                         onClick={() =>
                                             setShowConfirmPassword(!showConfirmPassword)
