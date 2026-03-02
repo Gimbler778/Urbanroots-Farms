@@ -40,3 +40,13 @@ export interface User {
   name: string
   address?: Address
 }
+
+export interface BuildingApplicationPayload {
+  full_name: string
+  phone: string
+  building_name: string
+  address: string
+  building_type: string
+  space_size: string
+  additional_info?: string
+}
