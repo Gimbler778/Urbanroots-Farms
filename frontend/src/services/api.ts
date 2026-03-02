@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { Product, Order, User } from '@/types'
+import type { Product, Order, User, BuildingApplicationPayload } from '@/types'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
 
@@ -46,6 +46,11 @@ export const getUser = async () => {
 
 export const updateUser = async (userData: Partial<User>) => {
   const response = await api.put<User>('/user', userData)
+  return response.data
+}
+
+export const submitBuildingApplication = async (payload: BuildingApplicationPayload) => {
+  const response = await api.post<{ message: string }>('/applications', payload, { withCredentials: true })
   return response.data
 }
 

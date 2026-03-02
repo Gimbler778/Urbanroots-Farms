@@ -75,15 +75,15 @@ export default function Footer() {
             <ul className="space-y-3">
               <li className="flex items-start space-x-2 text-sm text-muted-foreground">
                 <MapPin className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                <span>123 Urban Street, Green City, 560001</span>
+                <span>Near Airport, Gujarat, 382475</span>
               </li>
               <li className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <Phone className="w-4 h-4 text-primary flex-shrink-0" />
-                <span>+91 98765 43210</span>
+                <span>+91 9558730981</span>
               </li>
               <li className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <Mail className="w-4 h-4 text-primary flex-shrink-0" />
-                <span>hello@urbanroots.com</span>
+                <span>Urbanrootsfarms2000@gmail.com</span>
               </li>
             </ul>
           </div>
