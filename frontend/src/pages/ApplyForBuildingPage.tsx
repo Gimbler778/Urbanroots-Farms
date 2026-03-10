@@ -1,5 +1,8 @@
 import React, { useState } from 'react'
+import { motion } from 'framer-motion'
 import Layout from '@/components/Layout'
+import ScrollReveal from '@/components/ScrollReveal'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Building2, Mail, Phone, User, MapPin } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -61,6 +64,41 @@ export default function ApplyForBuildingPage() {
     }
   }
 
+  if (loading) {
+    return (
+      <Layout>
+        <section className="py-20 bg-gradient-to-b from-primary/10 to-background">
+          <div className="container mx-auto px-4">
+            <div className="max-w-2xl mx-auto space-y-8">
+              {/* Header skeleton */}
+              <div className="text-center space-y-4">
+                <Skeleton className="h-8 w-48 mx-auto rounded-full" />
+                <Skeleton className="h-12 w-80 mx-auto rounded-lg" />
+                <Skeleton className="h-5 w-96 mx-auto rounded-lg" />
+              </div>
+              {/* Form card skeleton */}
+              <div className="space-y-4">
+                <Skeleton className="h-14 w-full rounded-xl" />
+                <Skeleton className="h-14 w-full rounded-xl" />
+                <div className="grid md:grid-cols-2 gap-4">
+                  <Skeleton className="h-14 w-full rounded-xl" />
+                  <Skeleton className="h-14 w-full rounded-xl" />
+                </div>
+                <Skeleton className="h-24 w-full rounded-xl" />
+                <div className="grid md:grid-cols-2 gap-4">
+                  <Skeleton className="h-14 w-full rounded-xl" />
+                  <Skeleton className="h-14 w-full rounded-xl" />
+                </div>
+                <Skeleton className="h-14 w-full rounded-xl" />
+                <Skeleton className="h-12 w-48 rounded-xl" />
+              </div>
+            </div>
+          </div>
+        </section>
+      </Layout>
+    )
+  }
+
   if (!loading && !user) {
     return (
       <Layout>
@@ -88,19 +126,35 @@ export default function ApplyForBuildingPage() {
       <section className="py-20 bg-gradient-to-b from-primary/10 to-background">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto text-center space-y-6 mb-12">
-            <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20"
+            >
               <Building2 className="w-4 h-4 text-primary" />
               <span className="text-sm font-medium text-primary">Building Application</span>
-            </div>
-            <h1 className="text-5xl md:text-6xl font-bold">
+            </motion.div>
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.15 }}
+              className="text-5xl md:text-6xl font-bold"
+            >
               Apply for{' '}
               <span className="text-primary">Your Building</span>
-            </h1>
-            <p className="text-xl text-muted-foreground">
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="text-xl text-muted-foreground"
+            >
               Transform your building into an urban farm. Fill out the form below and our team will get in touch with you.
-            </p>
+            </motion.p>
           </div>
 
+          <ScrollReveal>
           <Card className="max-w-3xl mx-auto border-2 border-primary/20 shadow-xl">
             <CardHeader>
               <CardTitle className="text-2xl">Building Application Form</CardTitle>
@@ -264,6 +318,7 @@ export default function ApplyForBuildingPage() {
               </form>
             </CardContent>
           </Card>
+          </ScrollReveal>
         </div>
       </section>
 

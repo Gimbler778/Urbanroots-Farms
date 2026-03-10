@@ -10,12 +10,10 @@ export default function SignOutPage() {
     const performSignOut = async () => {
       try {
         await authClient.signOut()
-        navigate('/')
       } catch (error) {
         console.error('Sign out error:', error)
-        // Still redirect even if there's an error
-        navigate('/')
       }
+      window.location.href = '/'
     }
 
     performSignOut()

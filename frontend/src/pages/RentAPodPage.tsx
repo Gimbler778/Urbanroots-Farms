@@ -1,11 +1,14 @@
+import { motion } from 'framer-motion'
 import Layout from '@/components/Layout'
+import ScrollReveal from '@/components/ScrollReveal'
+import GlowCard from '@/components/GlowCard'
 import { Link } from 'react-router-dom'
 import { 
   Leaf, Package, Wrench, Check, 
   Droplets, Thermometer, Wifi, ShieldCheck,
   Sprout, Carrot, Apple, ArrowRight
 } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
 export default function RentAPodPage() {
@@ -15,18 +18,38 @@ export default function RentAPodPage() {
       <section id="hero" className="py-20 bg-gradient-to-b from-primary/10 to-background">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center space-y-6">
-            <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20"
+            >
               <Package className="w-4 h-4 text-primary" />
               <span className="text-sm font-medium text-primary">Pod Rental Service</span>
-            </div>
-            <h1 className="text-5xl md:text-6xl font-bold">
+            </motion.div>
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.15 }}
+              className="text-5xl md:text-6xl font-bold"
+            >
               Rent Your Own{' '}
               <span className="text-primary">Farming Pod</span>
-            </h1>
-            <p className="text-xl text-muted-foreground">
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="text-xl text-muted-foreground"
+            >
               Get everything you need to start growing fresh, organic produce in your building. Complete farming solution with expert support.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4 pt-4">
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.45 }}
+              className="flex flex-wrap justify-center gap-4 pt-4"
+            >
               <a href="#pod-details">
                 <Button variant="outline" size="lg" className="rounded-xl">
                   View Pods
@@ -38,7 +61,7 @@ export default function RentAPodPage() {
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </a>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -46,22 +69,23 @@ export default function RentAPodPage() {
       {/* Pod Details Section */}
       <section id="pod-details" className="py-20 scroll-mt-20">
         <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <ScrollReveal className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-4xl font-bold mb-6">
               Our <span className="text-primary">Farming Pods</span>
             </h2>
             <p className="text-lg text-muted-foreground">
               Choose from our range of modular farming pods designed for different space requirements and crop types.
             </p>
-          </div>
+          </ScrollReveal>
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Starter Pod */}
-            <Card className="border-2 border-primary/20 hover:border-primary/40 transition-all hover:shadow-xl">
-              <CardHeader>
-                <CardTitle className="text-2xl">Starter Pod</CardTitle>
-                <CardDescription>Perfect for small spaces and beginners</CardDescription>
-              </CardHeader>
+            <ScrollReveal delay={0}>
+              <GlowCard className="h-full">
+                <CardHeader>
+                  <CardTitle className="text-2xl">Starter Pod</CardTitle>
+                  <CardDescription>Perfect for small spaces and beginners</CardDescription>
+                </CardHeader>
               <CardContent className="space-y-6">
                 <div className="aspect-square bg-primary/10 rounded-xl flex items-center justify-center">
                   <Package className="w-24 h-24 text-primary" />
@@ -99,11 +123,13 @@ export default function RentAPodPage() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </GlowCard>
+            </ScrollReveal>
 
             {/* Standard Pod */}
-            <Card className="border-2 border-primary hover:border-primary transition-all hover:shadow-xl relative">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-white text-sm font-medium rounded-full">
+            <ScrollReveal delay={0.12}>
+            <GlowCard className="relative h-full">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-white text-sm font-medium rounded-full z-20">
                 Most Popular
               </div>
               <CardHeader>
@@ -147,10 +173,12 @@ export default function RentAPodPage() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </GlowCard>
+            </ScrollReveal>
 
             {/* Premium Pod */}
-            <Card className="border-2 border-primary/20 hover:border-primary/40 transition-all hover:shadow-xl">
+            <ScrollReveal delay={0.24}>
+            <GlowCard className="h-full">
               <CardHeader>
                 <CardTitle className="text-2xl">Premium Pod</CardTitle>
                 <CardDescription>Maximum yield for serious growers</CardDescription>
@@ -192,50 +220,30 @@ export default function RentAPodPage() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </GlowCard>
+            </ScrollReveal>
           </div>
 
           {/* Pod Features */}
           <div className="mt-16 grid md:grid-cols-4 gap-6">
-            <Card className="border border-primary/20">
-              <CardContent className="p-6 text-center space-y-3">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto">
-                  <Droplets className="w-6 h-6 text-primary" />
-                </div>
-                <h4 className="font-semibold">Water Efficient</h4>
-                <p className="text-sm text-muted-foreground">90% less water usage vs traditional farming</p>
-              </CardContent>
-            </Card>
-
-            <Card className="border border-primary/20">
-              <CardContent className="p-6 text-center space-y-3">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto">
-                  <Thermometer className="w-6 h-6 text-primary" />
-                </div>
-                <h4 className="font-semibold">Climate Control</h4>
-                <p className="text-sm text-muted-foreground">Optimal growing conditions year-round</p>
-              </CardContent>
-            </Card>
-
-            <Card className="border border-primary/20">
-              <CardContent className="p-6 text-center space-y-3">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto">
-                  <Wifi className="w-6 h-6 text-primary" />
-                </div>
-                <h4 className="font-semibold">Smart IoT</h4>
-                <p className="text-sm text-muted-foreground">Monitor and control from your phone</p>
-              </CardContent>
-            </Card>
-
-            <Card className="border border-primary/20">
-              <CardContent className="p-6 text-center space-y-3">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto">
-                  <ShieldCheck className="w-6 h-6 text-primary" />
-                </div>
-                <h4 className="font-semibold">Pest Free</h4>
-                <p className="text-sm text-muted-foreground">Protected environment, no chemicals needed</p>
-              </CardContent>
-            </Card>
+            {[
+              { icon: Droplets, title: 'Water Efficient', desc: '90% less water usage vs traditional farming' },
+              { icon: Thermometer, title: 'Climate Control', desc: 'Optimal growing conditions year-round' },
+              { icon: Wifi, title: 'Smart IoT', desc: 'Monitor and control from your phone' },
+              { icon: ShieldCheck, title: 'Pest Free', desc: 'Protected environment, no chemicals needed' },
+            ].map((feat, i) => (
+              <ScrollReveal key={feat.title} delay={i * 0.1}>
+                <GlowCard>
+                  <CardContent className="p-6 text-center space-y-3">
+                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto">
+                      <feat.icon className="w-6 h-6 text-primary" />
+                    </div>
+                    <h4 className="font-semibold">{feat.title}</h4>
+                    <p className="text-sm text-muted-foreground">{feat.desc}</p>
+                  </CardContent>
+                </GlowCard>
+              </ScrollReveal>
+            ))}
           </div>
         </div>
       </section>
@@ -243,17 +251,18 @@ export default function RentAPodPage() {
       {/* Services for Farming Section */}
       <section id="services" className="py-20 bg-primary/5 scroll-mt-20">
         <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <ScrollReveal className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-4xl font-bold mb-6">
               Comprehensive <span className="text-primary">Farming Services</span>
             </h2>
             <p className="text-lg text-muted-foreground">
               Everything you need for successful urban farming, all included in your subscription.
             </p>
-          </div>
+          </ScrollReveal>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="border-2 border-primary/20">
+            <ScrollReveal delay={0}>
+            <GlowCard>
               <CardContent className="p-8 space-y-4">
                 <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Sprout className="w-7 h-7 text-primary" />
@@ -263,9 +272,11 @@ export default function RentAPodPage() {
                   Premium organic seeds and seedlings delivered monthly. Choose from 50+ varieties.
                 </p>
               </CardContent>
-            </Card>
+            </GlowCard>
+            </ScrollReveal>
 
-            <Card className="border-2 border-primary/20">
+            <ScrollReveal delay={0.1}>
+            <GlowCard>
               <CardContent className="p-8 space-y-4">
                 <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Wrench className="w-7 h-7 text-primary" />
@@ -275,9 +286,11 @@ export default function RentAPodPage() {
                   Professional installation and setup by our expert team. Ready to grow in 24 hours.
                 </p>
               </CardContent>
-            </Card>
+            </GlowCard>
+            </ScrollReveal>
 
-            <Card className="border-2 border-primary/20">
+            <ScrollReveal delay={0.2}>
+            <GlowCard>
               <CardContent className="p-8 space-y-4">
                 <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
                   <ShieldCheck className="w-7 h-7 text-primary" />
@@ -287,9 +300,11 @@ export default function RentAPodPage() {
                   Regular maintenance visits and 24/7 technical support via phone or app.
                 </p>
               </CardContent>
-            </Card>
+            </GlowCard>
+            </ScrollReveal>
 
-            <Card className="border-2 border-primary/20">
+            <ScrollReveal delay={0.1}>
+            <GlowCard>
               <CardContent className="p-8 space-y-4">
                 <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Leaf className="w-7 h-7 text-primary" />
@@ -299,9 +314,11 @@ export default function RentAPodPage() {
                   100% organic fertilizers and nutrients tailored to your crops' needs.
                 </p>
               </CardContent>
-            </Card>
+            </GlowCard>
+            </ScrollReveal>
 
-            <Card className="border-2 border-primary/20">
+            <ScrollReveal delay={0.15}>
+            <GlowCard>
               <CardContent className="p-8 space-y-4">
                 <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Wifi className="w-7 h-7 text-primary" />
@@ -311,9 +328,11 @@ export default function RentAPodPage() {
                   Real-time monitoring of water, nutrients, light, and temperature via mobile app.
                 </p>
               </CardContent>
-            </Card>
+            </GlowCard>
+            </ScrollReveal>
 
-            <Card className="border-2 border-primary/20">
+            <ScrollReveal delay={0.2}>
+            <GlowCard>
               <CardContent className="p-8 space-y-4">
                 <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Carrot className="w-7 h-7 text-primary" />
@@ -323,7 +342,8 @@ export default function RentAPodPage() {
                   Expert guidance on when and how to harvest for maximum yield and flavor.
                 </p>
               </CardContent>
-            </Card>
+            </GlowCard>
+            </ScrollReveal>
           </div>
         </div>
       </section>
@@ -331,14 +351,14 @@ export default function RentAPodPage() {
       {/* Farming Equipment Section */}
       <section id="equipment" className="py-20 scroll-mt-20">
         <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <ScrollReveal className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-4xl font-bold mb-6">
               Premium <span className="text-primary">Farming Equipment</span>
             </h2>
             <p className="text-lg text-muted-foreground">
               All equipment included with your pod rental. No hidden costs or additional purchases needed.
             </p>
-          </div>
+          </ScrollReveal>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <div className="space-y-4">
@@ -406,7 +426,7 @@ export default function RentAPodPage() {
             </div>
 
             <div className="space-y-6">
-              <Card className="border-2 border-primary/20">
+              <GlowCard>
                 <CardContent className="p-8">
                   <h4 className="text-xl font-bold mb-4">What You Get</h4>
                   <ul className="space-y-3 text-muted-foreground">
@@ -432,9 +452,9 @@ export default function RentAPodPage() {
                     </li>
                   </ul>
                 </CardContent>
-              </Card>
+              </GlowCard>
 
-              <Card className="border-2 border-primary/20 bg-primary/5">
+              <GlowCard className="bg-primary/5">
                 <CardContent className="p-8 text-center">
                   <div className="text-4xl font-bold text-primary mb-2">100%</div>
                   <div className="text-lg font-semibold mb-2">Hassle-Free</div>
@@ -442,7 +462,7 @@ export default function RentAPodPage() {
                     We handle maintenance, repairs, and upgrades. You just enjoy the harvest!
                   </p>
                 </CardContent>
-              </Card>
+              </GlowCard>
             </div>
           </div>
         </div>
@@ -451,18 +471,19 @@ export default function RentAPodPage() {
       {/* Pricing Section */}
       <section id="pricing" className="py-20 bg-primary/5 scroll-mt-20">
         <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <ScrollReveal className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-4xl font-bold mb-6">
               Simple, Transparent <span className="text-primary">Pricing</span>
             </h2>
             <p className="text-lg text-muted-foreground">
               Choose the plan that fits your needs. No hidden fees, cancel anytime.
             </p>
-          </div>
+          </ScrollReveal>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {/* Starter Pricing */}
-            <Card className="border-2 border-primary/20">
+            <ScrollReveal delay={0}>
+            <GlowCard className="h-full">
               <CardHeader>
                 <CardTitle className="text-2xl">Starter</CardTitle>
                 <CardDescription>Perfect for beginners</CardDescription>
@@ -497,11 +518,13 @@ export default function RentAPodPage() {
                   Choose Plan
                 </Button>
               </CardContent>
-            </Card>
+            </GlowCard>
+            </ScrollReveal>
 
             {/* Standard Pricing */}
-            <Card className="border-2 border-primary shadow-xl relative scale-105">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-6 py-2 bg-primary text-white font-medium rounded-full">
+            <ScrollReveal delay={0.12}>
+            <GlowCard className="relative h-full">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-6 py-2 bg-primary text-white font-medium rounded-full z-20">
                 Best Value
               </div>
               <CardHeader>
@@ -542,10 +565,12 @@ export default function RentAPodPage() {
                   Choose Plan
                 </Button>
               </CardContent>
-            </Card>
+            </GlowCard>
+            </ScrollReveal>
 
             {/* Premium Pricing */}
-            <Card className="border-2 border-primary/20">
+            <ScrollReveal delay={0.24}>
+            <GlowCard className="h-full">
               <CardHeader>
                 <CardTitle className="text-2xl">Premium</CardTitle>
                 <CardDescription>Maximum production</CardDescription>
@@ -584,7 +609,8 @@ export default function RentAPodPage() {
                   Choose Plan
                 </Button>
               </CardContent>
-            </Card>
+            </GlowCard>
+            </ScrollReveal>
           </div>
 
           <div className="mt-12 text-center">
@@ -600,7 +626,8 @@ export default function RentAPodPage() {
       <section id="subscribe" className="py-20 scroll-mt-20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <Card className="border-2 border-primary/20 shadow-2xl overflow-hidden">
+            <ScrollReveal>
+            <GlowCard className="shadow-2xl overflow-hidden">
               <CardContent className="p-12 text-center space-y-6 bg-gradient-to-br from-primary/10 to-secondary/20">
                 <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center mx-auto">
                   <Leaf className="w-10 h-10 text-primary" />
@@ -630,7 +657,8 @@ export default function RentAPodPage() {
                   💚 30-day money-back guarantee • 🌱 Cancel anytime • 🚀 Setup in 24 hours
                 </p>
               </CardContent>
-            </Card>
+            </GlowCard>
+            </ScrollReveal>
           </div>
         </div>
       </section>

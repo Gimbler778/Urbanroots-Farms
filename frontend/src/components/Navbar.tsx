@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Menu, X, User, ShoppingCart, Pencil, LogOut } from 'lucide-react'
 import { useState, useRef } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import UrbanRootsLogo from './UrbanRootsLogo'
 import { useAuth } from '@/hooks/useAuth'
@@ -72,13 +73,20 @@ export default function Navbar() {
                 to={item.path}
                 onClick={scrollToTop}
                 className={cn(
-                  "px-4 py-2 rounded-lg text-sm font-medium transition-all",
+                  "relative px-4 py-2 rounded-lg text-sm font-medium transition-colors",
                   isActive(item.path)
-                    ? "text-primary bg-primary/10"
-                    : "text-foreground/70 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10"
+                    ? "text-primary"
+                    : "text-foreground/70 hover:text-[hsl(var(--earth-brown))]"
                 )}
               >
-                {item.name}
+                {isActive(item.path) && (
+                  <motion.div
+                    layoutId="nav-active-bg"
+                    className="absolute inset-0 bg-primary/10 rounded-lg"
+                    transition={{ type: 'spring', bounce: 0.18, duration: 0.45 }}
+                  />
+                )}
+                <span className="relative z-10">{item.name}</span>
               </Link>
             ))}
 
@@ -177,8 +185,15 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Navigation */}
+        <AnimatePresence>
         {isOpen && (
-          <div className="md:hidden pb-4 space-y-2">
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            className="md:hidden overflow-hidden pb-4 space-y-2"
+          >
             {navItems.map((item) => (
               <Link
                 key={item.path}
@@ -258,8 +273,9 @@ export default function Navbar() {
                 </Link>
               )}
             </div>
-          </div>
+          </motion.div>
         )}
+        </AnimatePresence>
       </div>
     </nav>
   )

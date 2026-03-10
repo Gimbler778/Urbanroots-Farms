@@ -80,7 +80,7 @@ export default function SignInPage() {
 
         if (response.data.user) {
           await refreshSession()
-          navigate("/")
+          window.location.href = "/"
         }
       }
     } catch (err: any) {

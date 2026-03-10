@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import Layout from '@/components/Layout'
+import ScrollReveal from '@/components/ScrollReveal'
+import GlowCard from '@/components/GlowCard'
 import { Leaf, Sprout, Heart, TrendingUp, Users, Shield, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
+import { CardContent } from '@/components/ui/card'
 
 const features = [
   { icon: Sprout, title: '100% Organic', desc: 'Grow pesticide-free, organic produce using sustainable farming practices and natural nutrients.' },
@@ -15,7 +18,7 @@ const features = [
 
 function FeatureCard({ icon: Icon, title, desc }: { icon: React.ElementType; title: string; desc: string }) {
   return (
-    <Card className="w-[280px] min-w-[280px] max-w-[280px] flex-shrink-0 border-2 border-primary/20 hover:border-[hsl(var(--earth-brown))]/60 transition-all duration-300 hover:shadow-2xl hover:scale-[1.05] hover:-translate-y-2 rounded-2xl">
+    <GlowCard className="w-[280px] min-w-[280px] max-w-[280px] flex-shrink-0 rounded-2xl" lift={false}>
       <CardContent className="p-6 space-y-3">
         <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
           <Icon className="w-6 h-6 text-primary" />
@@ -23,7 +26,7 @@ function FeatureCard({ icon: Icon, title, desc }: { icon: React.ElementType; tit
         <h3 className="text-lg font-bold">{title}</h3>
         <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
       </CardContent>
-    </Card>
+    </GlowCard>
   )
 }
 
@@ -41,26 +44,46 @@ export default function HomePage() {
         <div className="container mx-auto px-4 py-20 relative z-10">
           <div className="max-w-4xl mx-auto text-center space-y-8">
             {/* Badge */}
-            <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20"
+            >
               <Leaf className="w-4 h-4 text-primary" />
               <span className="text-sm font-medium text-primary">Sustainable Urban Farming</span>
-            </div>
+            </motion.div>
 
             {/* Main Heading */}
-            <h1 className="text-5xl md:text-7xl font-bold leading-tight">
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.25 }}
+              className="text-5xl md:text-7xl font-bold leading-tight"
+            >
               Grow Fresh,{' '}
               <span className="text-primary">Organic Produce</span>
               <br />
               Right in Your Building
-            </h1>
+            </motion.h1>
 
             {/* Subheading */}
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto"
+            >
               Transform unused spaces into thriving urban farms. Farm-to-table freshness without leaving your building.
-            </p>
+            </motion.p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.55 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4"
+            >
               <Link to="/rent-a-pod">
                 <Button size="lg" className="text-lg px-8 py-6 rounded-xl shadow-lg hover:shadow-xl transition-all">
                   Get Started
@@ -76,10 +99,15 @@ export default function HomePage() {
                   Learn More
                 </Button>
               </Link>
-            </div>
+            </motion.div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-8 pt-12 max-w-2xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.7 }}
+              className="grid grid-cols-3 gap-8 pt-12 max-w-2xl mx-auto"
+            >
               <div className="text-center">
                 <div className="text-3xl md:text-4xl font-bold text-primary">50+</div>
                 <div className="text-sm text-muted-foreground mt-1">Active Pods</div>
@@ -92,7 +120,7 @@ export default function HomePage() {
                 <div className="text-3xl md:text-4xl font-bold text-primary">24/7</div>
                 <div className="text-sm text-muted-foreground mt-1">Support</div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
 
@@ -107,14 +135,14 @@ export default function HomePage() {
       {/* Why UrbanRoots Section */}
       <section className="py-20 bg-primary/5 overflow-hidden">
         <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <ScrollReveal className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
               Why Choose <span className="text-primary">UrbanRoots</span>?
             </h2>
             <p className="text-lg text-muted-foreground">
               We're revolutionizing urban agriculture by bringing sustainable farming solutions directly to your doorstep.
             </p>
-          </div>
+          </ScrollReveal>
 
           {/* Infinite Marquee */}
           <div className="relative py-8 overflow-hidden group">
@@ -140,33 +168,35 @@ export default function HomePage() {
       <section className="py-20 bg-gradient-to-b from-background to-primary/5">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <Card className="border-2 border-primary/20 shadow-2xl overflow-hidden">
-              <CardContent className="p-12 text-center space-y-6 bg-gradient-to-br from-primary/5 to-secondary/20">
-                <h2 className="text-3xl md:text-4xl font-bold">
-                  Ready to Start Your Urban Farm?
-                </h2>
-                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                  Join the urban farming revolution today. Transform your building's unused space into a sustainable food source.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-                  <Link to="/rent-a-pod">
-                    <Button size="lg" className="text-lg px-10 py-6 rounded-xl">
-                      Rent a Pod Now
-                      <ArrowRight className="ml-2 w-5 h-5" />
-                    </Button>
-                  </Link>
-                  <Link to="/apply-for-building">
-                    <Button 
-                      variant="outline" 
-                      size="lg" 
-                      className="text-lg px-10 py-6 rounded-xl border-2"
-                    >
-                      Apply for Your Building
-                    </Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
+            <ScrollReveal>
+              <GlowCard className="shadow-2xl overflow-hidden">
+                <CardContent className="p-12 text-center space-y-6 bg-gradient-to-br from-primary/5 to-secondary/20">
+                  <h2 className="text-3xl md:text-4xl font-bold">
+                    Ready to Start Your Urban Farm?
+                  </h2>
+                  <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                    Join the urban farming revolution today. Transform your building's unused space into a sustainable food source.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+                    <Link to="/rent-a-pod">
+                      <Button size="lg" className="text-lg px-10 py-6 rounded-xl">
+                        Rent a Pod Now
+                        <ArrowRight className="ml-2 w-5 h-5" />
+                      </Button>
+                    </Link>
+                    <Link to="/apply-for-building">
+                      <Button 
+                        variant="outline" 
+                        size="lg" 
+                        className="text-lg px-10 py-6 rounded-xl border-2"
+                      >
+                        Apply for Your Building
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </GlowCard>
+            </ScrollReveal>
           </div>
         </div>
       </section>

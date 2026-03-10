@@ -3,6 +3,7 @@ import { ThemeProvider } from './components/theme-provider'
 import { CartProvider } from './contexts/CartContext'
 import { AuthProvider } from './hooks/useAuth'
 import ScrollToTop from './components/ScrollToTop'
+import RouteSkeletonOverlay from './components/RouteSkeletonOverlay'
 import HomePage from './pages/HomePage'
 import AboutPage from './pages/AboutPage'
 import ApplyForBuildingPage from './pages/ApplyForBuildingPage'
@@ -23,6 +24,7 @@ function App() {
       <AuthProvider>
         <CartProvider>
           <Router>
+            <RouteSkeletonOverlay />
             <ScrollToTop />
             <Routes>
               <Route path="/" element={<HomePage />} />
