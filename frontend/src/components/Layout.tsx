@@ -1,5 +1,6 @@
 import Navbar from './Navbar'
 import Footer from './Footer'
+import MorphingSVG from './MorphingSVG'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -13,6 +14,7 @@ export default function Layout({ children }: LayoutProps) {
         {children}
       </main>
       <Footer />
+      <MorphingSVG />
     </div>
   )
 }
