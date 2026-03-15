@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     mail_server: str = "smtp.gmail.com"
     mail_starttls: bool = True
     mail_ssl_tls: bool = False
+    admin_email: str = "urbanrootsfarms2000@gmail.com"
 
     # ---------------- AUTH ---------------- #
     secret_key: str = "change-me"

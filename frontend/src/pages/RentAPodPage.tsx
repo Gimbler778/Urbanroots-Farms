@@ -2,16 +2,21 @@ import { motion } from 'framer-motion'
 import Layout from '@/components/Layout'
 import ScrollReveal from '@/components/ScrollReveal'
 import GlowCard from '@/components/GlowCard'
+import PodRentalDialog from '@/components/PodRentalDialog'
 import { Link } from 'react-router-dom'
 import { 
   Leaf, Package, Wrench, Check, 
   Droplets, Thermometer, Wifi, ShieldCheck,
   Sprout, Carrot, Apple, ArrowRight
 } from 'lucide-react'
+import { useState } from 'react'
 import { CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { podPlans, type PodPlan } from '@/data/podPlans'
 
 export default function RentAPodPage() {
+  const [selectedPod, setSelectedPod] = useState<PodPlan | null>(null)
+
   return (
     <Layout>
       {/* Hero Section */}
@@ -79,149 +84,61 @@ export default function RentAPodPage() {
           </ScrollReveal>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Starter Pod */}
-            <ScrollReveal delay={0}>
-              <GlowCard className="h-full">
-                <CardHeader>
-                  <CardTitle className="text-2xl">Starter Pod</CardTitle>
-                  <CardDescription>Perfect for small spaces and beginners</CardDescription>
-                </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="aspect-square bg-primary/10 rounded-xl flex items-center justify-center">
-                  <Package className="w-24 h-24 text-primary" />
-                </div>
-                
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3 text-sm">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span>4x4 ft growing area</span>
-                  </div>
-                  <div className="flex items-center space-x-3 text-sm">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span>Grow up to 20 plants</span>
-                  </div>
-                  <div className="flex items-center space-x-3 text-sm">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span>Smart drip irrigation</span>
-                  </div>
-                  <div className="flex items-center space-x-3 text-sm">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span>LED grow lights</span>
-                  </div>
-                  <div className="flex items-center space-x-3 text-sm">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span>Mobile app monitoring</span>
-                  </div>
-                </div>
+            {podPlans.map((pod, index) => (
+              <ScrollReveal key={pod.id} delay={index * 0.12}>
+                <GlowCard className="relative h-full overflow-visible">
+                  {pod.accentLabel ? (
+                    <div className="absolute -top-3 left-1/2 z-20 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-sm font-medium text-white">
+                      {pod.accentLabel}
+                    </div>
+                  ) : null}
+                  <CardHeader>
+                    <CardTitle className="text-2xl">{pod.name}</CardTitle>
+                    <CardDescription>{pod.tagline}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <Link to={`/rent-a-pod/${pod.slug}`} className="block overflow-hidden rounded-2xl border border-primary/10 bg-primary/5">
+                      <img src={pod.images[0]} alt={pod.name} className="aspect-square w-full object-cover transition-transform duration-500 hover:scale-[1.03]" />
+                    </Link>
 
-                <div className="pt-4 border-t">
-                  <div className="text-sm text-muted-foreground mb-1">Best for</div>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="px-3 py-1 bg-primary/10 rounded-full text-xs">Herbs</span>
-                    <span className="px-3 py-1 bg-primary/10 rounded-full text-xs">Leafy Greens</span>
-                    <span className="px-3 py-1 bg-primary/10 rounded-full text-xs">Microgreens</span>
-                  </div>
-                </div>
-              </CardContent>
-            </GlowCard>
-            </ScrollReveal>
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3 text-sm">
+                        <Check className="w-5 h-5 text-primary flex-shrink-0" />
+                        <span>{pod.area}</span>
+                      </div>
+                      <div className="flex items-center space-x-3 text-sm">
+                        <Check className="w-5 h-5 text-primary flex-shrink-0" />
+                        <span>{pod.maxPlants}</span>
+                      </div>
+                      {pod.features.slice(0, 3).map((feature) => (
+                        <div key={feature} className="flex items-center space-x-3 text-sm">
+                          <Check className="w-5 h-5 text-primary flex-shrink-0" />
+                          <span>{feature}</span>
+                        </div>
+                      ))}
+                    </div>
 
-            {/* Standard Pod */}
-            <ScrollReveal delay={0.12}>
-            <GlowCard className="relative h-full">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-white text-sm font-medium rounded-full z-20">
-                Most Popular
-              </div>
-              <CardHeader>
-                <CardTitle className="text-2xl">Standard Pod</CardTitle>
-                <CardDescription>Ideal for families and regular use</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="aspect-square bg-primary/10 rounded-xl flex items-center justify-center">
-                  <Package className="w-24 h-24 text-primary" />
-                </div>
-                
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3 text-sm">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span>8x4 ft growing area</span>
-                  </div>
-                  <div className="flex items-center space-x-3 text-sm">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span>Grow up to 40 plants</span>
-                  </div>
-                  <div className="flex items-center space-x-3 text-sm">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span>Advanced irrigation system</span>
-                  </div>
-                  <div className="flex items-center space-x-3 text-sm">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span>Climate control</span>
-                  </div>
-                  <div className="flex items-center space-x-3 text-sm">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span>IoT monitoring & alerts</span>
-                  </div>
-                </div>
+                    <div className="pt-4 border-t">
+                      <div className="text-sm text-muted-foreground mb-1">Best for</div>
+                      <div className="flex flex-wrap gap-2">
+                        {pod.crops.map((crop) => (
+                          <span key={crop} className="rounded-full bg-primary/10 px-3 py-1 text-xs">{crop}</span>
+                        ))}
+                      </div>
+                    </div>
 
-                <div className="pt-4 border-t">
-                  <div className="text-sm text-muted-foreground mb-1">Best for</div>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="px-3 py-1 bg-primary/10 rounded-full text-xs">Vegetables</span>
-                    <span className="px-3 py-1 bg-primary/10 rounded-full text-xs">Herbs</span>
-                    <span className="px-3 py-1 bg-primary/10 rounded-full text-xs">Small Fruits</span>
-                  </div>
-                </div>
-              </CardContent>
-            </GlowCard>
-            </ScrollReveal>
-
-            {/* Premium Pod */}
-            <ScrollReveal delay={0.24}>
-            <GlowCard className="h-full">
-              <CardHeader>
-                <CardTitle className="text-2xl">Premium Pod</CardTitle>
-                <CardDescription>Maximum yield for serious growers</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="aspect-square bg-primary/10 rounded-xl flex items-center justify-center">
-                  <Package className="w-24 h-24 text-primary" />
-                </div>
-                
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3 text-sm">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span>12x8 ft growing area</span>
-                  </div>
-                  <div className="flex items-center space-x-3 text-sm">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span>Grow up to 80 plants</span>
-                  </div>
-                  <div className="flex items-center space-x-3 text-sm">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span>Automated hydroponic system</span>
-                  </div>
-                  <div className="flex items-center space-x-3 text-sm">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span>Full climate control</span>
-                  </div>
-                  <div className="flex items-center space-x-3 text-sm">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span>AI-powered optimization</span>
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t">
-                  <div className="text-sm text-muted-foreground mb-1">Best for</div>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="px-3 py-1 bg-primary/10 rounded-full text-xs">All Crops</span>
-                    <span className="px-3 py-1 bg-primary/10 rounded-full text-xs">Year-Round</span>
-                    <span className="px-3 py-1 bg-primary/10 rounded-full text-xs">High Yield</span>
-                  </div>
-                </div>
-              </CardContent>
-            </GlowCard>
-            </ScrollReveal>
+                    <div className="flex gap-3">
+                      <Button asChild variant="outline" className="flex-1">
+                        <Link to={`/rent-a-pod/${pod.slug}`}>View Pod</Link>
+                      </Button>
+                      <Button className="flex-1" onClick={() => setSelectedPod(pod)}>
+                        Choose Plan
+                      </Button>
+                    </div>
+                  </CardContent>
+                </GlowCard>
+              </ScrollReveal>
+            ))}
           </div>
 
           {/* Pod Features */}
@@ -514,7 +431,7 @@ export default function RentAPodPage() {
                     <span className="text-sm">Quarterly maintenance</span>
                   </li>
                 </ul>
-                <Button variant="outline" className="w-full py-6">
+                <Button variant="outline" className="w-full py-6" onClick={() => setSelectedPod(podPlans[0])}>
                   Choose Plan
                 </Button>
               </CardContent>
@@ -561,7 +478,7 @@ export default function RentAPodPage() {
                     <span className="text-sm">Free nutrient refills</span>
                   </li>
                 </ul>
-                <Button className="w-full py-6">
+                <Button className="w-full py-6" onClick={() => setSelectedPod(podPlans[1])}>
                   Choose Plan
                 </Button>
               </CardContent>
@@ -605,7 +522,7 @@ export default function RentAPodPage() {
                     <span className="text-sm">Premium nutrients & supplies</span>
                   </li>
                 </ul>
-                <Button variant="outline" className="w-full py-6">
+                <Button variant="outline" className="w-full py-6" onClick={() => setSelectedPod(podPlans[2])}>
                   Choose Plan
                 </Button>
               </CardContent>
@@ -639,7 +556,7 @@ export default function RentAPodPage() {
                   Join hundreds of urban farmers already growing fresh, organic produce in their buildings. Start your journey today!
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-                  <Button size="lg" className="text-lg px-10 py-6 rounded-xl">
+                  <Button size="lg" className="text-lg px-10 py-6 rounded-xl" onClick={() => setSelectedPod(podPlans[1])}>
                     Subscribe Now
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
@@ -662,6 +579,8 @@ export default function RentAPodPage() {
           </div>
         </div>
       </section>
+
+      <PodRentalDialog open={Boolean(selectedPod)} onOpenChange={(open) => { if (!open) setSelectedPod(null) }} pod={selectedPod} />
     </Layout>
   )
 }

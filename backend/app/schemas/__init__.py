@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
-from datetime import datetime
-from typing import Optional, List
+from datetime import date, datetime
+from typing import Dict, Optional, List
 from enum import Enum
 
 
@@ -10,6 +10,21 @@ class OrderStatus(str, Enum):
     SHIPPED = "shipped"
     DELIVERED = "delivered"
     CANCELLED = "cancelled"
+
+
+class PodRentalStatus(str, Enum):
+    REQUESTED = "requested"
+    CONTACT_SCHEDULED = "contact_scheduled"
+    RENTING = "renting"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+
+
+class BuildingApplicationStatus(str, Enum):
+    SUBMITTED = "submitted"
+    REVIEWING = "reviewing"
+    APPROVED = "approved"
+    REJECTED = "rejected"
 
 
 # Product Schemas
@@ -109,3 +124,111 @@ class Order(OrderBase):
 
     class Config:
         from_attributes = True
+
+
+class PodRentalCreate(BaseModel):
+    pod_plan_id: str
+    full_name: str
+    email: str
+    phone: str
+    installation_address: str
+    city: str
+    state: str
+    zip_code: str
+    preferred_start_date: date
+    rental_term_months: int = Field(ge=1, le=36)
+    building_name: Optional[str] = None
+    location_type: str
+    growing_goals: Optional[str] = None
+    notes: Optional[str] = None
+    terms_accepted: bool
+
+
+class PodRental(BaseModel):
+    id: str
+    user_id: str
+    pod_plan_id: str
+    pod_name: str
+    pod_size: str
+    monthly_price: float
+    installation_fee: float
+    status: PodRentalStatus
+    full_name: str
+    email: str
+    phone: str
+    installation_address: str
+    city: str
+    state: str
+    zip_code: str
+    preferred_start_date: str
+    rental_term_months: int
+    building_name: Optional[str] = None
+    location_type: str
+    growing_goals: Optional[str] = None
+    notes: Optional[str] = None
+    terms_accepted: bool
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class PodRentalResponse(BaseModel):
+    rental: PodRental
+    email_delivered: bool
+    message: str
+
+
+class PodRentalStatusUpdate(BaseModel):
+    status: PodRentalStatus
+
+
+class OrderHistoryItem(BaseModel):
+    id: str
+    type: str
+    title: str
+    subtitle: str
+    status: str
+    created_at: datetime
+    total: Optional[float] = None
+    monthly_price: Optional[float] = None
+    installation_fee: Optional[float] = None
+    pod_size: Optional[str] = None
+    preferred_start_date: Optional[str] = None
+    rental_term_months: Optional[int] = None
+    item_count: Optional[int] = None
+    details: Dict[str, str]
+
+
+class BuildingApplicationCreate(BaseModel):
+    full_name: str
+    phone: str
+    building_name: str
+    address: str
+    building_type: str
+    space_size: str
+    additional_info: Optional[str] = None
+
+
+class BuildingApplication(BaseModel):
+    id: str
+    user_id: str
+    user_email: str
+    full_name: str
+    phone: str
+    building_name: str
+    address: str
+    building_type: str
+    space_size: str
+    additional_info: Optional[str] = None
+    status: BuildingApplicationStatus
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class BuildingApplicationStatusUpdate(BaseModel):
+    status: BuildingApplicationStatus

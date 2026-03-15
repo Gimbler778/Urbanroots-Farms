@@ -1,11 +1,11 @@
-from datetime import datetime, timezone
-from fastapi import APIRouter, HTTPException, status, Depends, Request
-from pydantic import BaseModel
+from fastapi import APIRouter, status, Depends
 from sqlalchemy.orm import Session
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
 from app.core.config import settings
 from app.core.database import get_db
-from app.models import User, Session as AuthSession
+from app.api.dependencies import get_current_user
+from app.models import BuildingApplication, User
+from app.schemas import BuildingApplicationCreate
 
 
 router = APIRouter(tags=["applications"])
@@ -24,32 +24,7 @@ conf = ConnectionConfig(
 )
 
 
-class BuildingApplication(BaseModel):
-    full_name: str
-    phone: str
-    building_name: str
-    address: str
-    building_type: str
-    space_size: str
-    additional_info: str | None = None
-
-
-def get_current_user(request: Request, db: Session) -> User:
-    session_token = request.cookies.get("better-auth.session_token")
-    if not session_token:
-        raise HTTPException(status_code=401, detail="Please sign in to apply")
-
-    session = db.query(AuthSession).filter(AuthSession.id == session_token).first()
-    if not session or session.expiresAt < datetime.now(timezone.utc):
-        raise HTTPException(status_code=401, detail="Session expired. Please sign in again")
-
-    user = db.query(User).filter(User.id == session.userId).first()
-    if not user:
-        raise HTTPException(status_code=401, detail="User not found")
-    return user
-
-
-async def send_application_emails(application: BuildingApplication, applicant_email: str) -> None:
+async def send_application_emails(application: BuildingApplicationCreate, applicant_email: str) -> None:
     fm = FastMail(conf)
 
     def admin_template() -> str:
@@ -147,13 +122,31 @@ async def send_application_emails(application: BuildingApplication, applicant_em
 
 @router.post("/applications", status_code=status.HTTP_201_CREATED)
 async def submit_application(
-    application: BuildingApplication,
-    request: Request,
-    db: Session = Depends(get_db)
+    application: BuildingApplicationCreate,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
 ):
-    user = get_current_user(request, db)
+    db_application = BuildingApplication(
+        user_id=user.id,
+        user_email=user.email,
+        full_name=application.full_name,
+        phone=application.phone,
+        building_name=application.building_name,
+        address=application.address,
+        building_type=application.building_type,
+        space_size=application.space_size,
+        additional_info=application.additional_info,
+    )
+    db.add(db_application)
+    db.commit()
+    db.refresh(db_application)
+
     try:
         await send_application_emails(application, user.email)
-        return {"message": "Application submitted"}
-    except Exception as exc:  # pragma: no cover
-        raise HTTPException(status_code=500, detail="Failed to send application emails") from exc
+        return {"message": "Application submitted", "application_id": db_application.id, "email_delivered": True}
+    except Exception:  # pragma: no cover
+        return {
+            "message": "Application submitted, but email delivery failed",
+            "application_id": db_application.id,
+            "email_delivered": False,
+        }

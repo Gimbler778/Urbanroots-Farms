@@ -463,7 +463,8 @@ async def sign_up(
             name=data.name,
             email=data.email,
             passwordHash=hash_password(data.password),
-            emailVerified=False
+            emailVerified=False,
+            role="admin" if data.email.lower() == settings.admin_email.lower() else "user",
         )
         db.add(user)
 
@@ -641,6 +642,7 @@ async def sign_in(
             "id": user.id,
             "name": user.name,
             "email": user.email,
+            "role": user.role,
         }
     }
 
@@ -676,6 +678,7 @@ async def get_session(
             "name": user.name,
             "email": user.email,
             "emailVerified": user.emailVerified,
+            "role": user.role,
             "image": user.image,
             "bio": getattr(user, 'bio', None),
             "avatarSeed": getattr(user, 'avatarSeed', None),
@@ -720,6 +723,7 @@ async def update_profile(
             "id": user.id,
             "name": user.name,
             "email": user.email,
+            "role": user.role,
             "bio": user.bio,
             "avatarSeed": user.avatarSeed,
         }

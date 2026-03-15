@@ -12,6 +12,7 @@ class User(Base):
     image= Column(String, nullable=True)
     passwordHash = Column(String, nullable=False)
     emailVerified = Column(Boolean, default=False)
+    role = Column(String, nullable=False, default="user")
     bio = Column(String, nullable=True)
     avatarSeed = Column(String, nullable=True)
     createdAt = Column(DateTime(timezone=True), server_default=func.now())

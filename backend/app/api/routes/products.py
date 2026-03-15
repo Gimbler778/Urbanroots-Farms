@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from app.core.database import get_db
+from app.api.dependencies import get_current_admin
+from app.models import User
 from app.schemas import Product, ProductCreate, ProductUpdate
 from app.services.product_service import ProductService
 
@@ -30,7 +32,11 @@ def get_product(product_id: str, db: Session = Depends(get_db)):
 
 
 @router.post("/", response_model=Product, status_code=201)
-def create_product(product: ProductCreate, db: Session = Depends(get_db)):
+def create_product(
+    product: ProductCreate,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_admin),
+):
     """Create a new product"""
     return ProductService.create_product(db, product)
 
@@ -39,7 +45,8 @@ def create_product(product: ProductCreate, db: Session = Depends(get_db)):
 def update_product(
     product_id: str,
     product: ProductUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_admin),
 ):
     """Update a product"""
     updated_product = ProductService.update_product(db, product_id, product)
@@ -49,7 +56,11 @@ def update_product(
 
 
 @router.delete("/{product_id}", status_code=204)
-def delete_product(product_id: str, db: Session = Depends(get_db)):
+def delete_product(
+    product_id: str,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_admin),
+):
     """Delete a product"""
     success = ProductService.delete_product(db, product_id)
     if not success:

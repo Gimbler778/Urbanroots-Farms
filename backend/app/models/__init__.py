@@ -37,6 +37,7 @@ class Order(Base):
     __tablename__ = "orders"
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(String, nullable=True, index=True)
     total = Column(Float, nullable=False)
     status = Column(Enum(OrderStatus), default=OrderStatus.PENDING)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -67,3 +68,65 @@ class OrderItem(Base):
     # Relationships
     order = relationship("Order", back_populates="items")
     product = relationship("Product")
+
+
+class PodRentalStatus(str, enum.Enum):
+    REQUESTED = "requested"
+    CONTACT_SCHEDULED = "contact_scheduled"
+    RENTING = "renting"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+
+
+class PodRental(Base):
+    __tablename__ = "pod_rentals"
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(String, nullable=False, index=True)
+    pod_plan_id = Column(String, nullable=False)
+    pod_name = Column(String, nullable=False)
+    pod_size = Column(String, nullable=False)
+    monthly_price = Column(Float, nullable=False)
+    installation_fee = Column(Float, nullable=False)
+    status = Column(Enum(PodRentalStatus), default=PodRentalStatus.REQUESTED, nullable=False)
+    full_name = Column(String, nullable=False)
+    email = Column(String, nullable=False)
+    phone = Column(String, nullable=False)
+    installation_address = Column(Text, nullable=False)
+    city = Column(String, nullable=False)
+    state = Column(String, nullable=False)
+    zip_code = Column(String, nullable=False)
+    preferred_start_date = Column(String, nullable=False)
+    rental_term_months = Column(Integer, nullable=False)
+    building_name = Column(String, nullable=True)
+    location_type = Column(String, nullable=False)
+    growing_goals = Column(Text, nullable=True)
+    notes = Column(Text, nullable=True)
+    terms_accepted = Column(Boolean, nullable=False, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class BuildingApplicationStatus(str, enum.Enum):
+    SUBMITTED = "submitted"
+    REVIEWING = "reviewing"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+
+
+class BuildingApplication(Base):
+    __tablename__ = "building_applications"
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(String, ForeignKey("user.id"), nullable=False, index=True)
+    user_email = Column(String, nullable=False)
+    full_name = Column(String, nullable=False)
+    phone = Column(String, nullable=False)
+    building_name = Column(String, nullable=False)
+    address = Column(Text, nullable=False)
+    building_type = Column(String, nullable=False)
+    space_size = Column(String, nullable=False)
+    additional_info = Column(Text, nullable=True)
+    status = Column(Enum(BuildingApplicationStatus), default=BuildingApplicationStatus.SUBMITTED, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

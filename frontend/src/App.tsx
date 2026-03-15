@@ -15,8 +15,11 @@ import VerifyEmail from './pages/VerifyEmail'
 import ForgotPassword from './pages/ForgotPassword'
 import ProductsPage from './pages/ProductsPage'
 import ProductDetailPage from './pages/ProductDetailPage'
+import PodDetailPage from './pages/PodDetailPage'
 import CartPage from './pages/CartPage'
 import ProfilePage from './pages/ProfilePage'
+import MyOrdersPage from './pages/MyOrdersPage'
+import AdminDashboardPage from './pages/AdminDashboardPage'
 
 function App() {
   return (
@@ -35,11 +38,14 @@ function App() {
               <Route path="/apply-for-building" element={<ApplyForBuildingPage />} />
               <Route path="/refer-friend" element={<ReferFriendPage />} />
               <Route path="/rent-a-pod" element={<RentAPodPage />} />
+              <Route path="/rent-a-pod/:podId" element={<PodDetailPage />} />
               <Route path="/sign-in" element={<SignInPage />} />
               <Route path="/sign-out" element={<SignOutPage />} />
               <Route path="/verify-email" element={<VerifyEmail />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/my-orders" element={<MyOrdersPage />} />
+              <Route path="/admin" element={<AdminDashboardPage />} />
             </Routes>
           </Router>
         </CartProvider>

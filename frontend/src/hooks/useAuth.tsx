@@ -7,6 +7,7 @@ export interface UserData {
   id: string
   name: string
   email: string
+  role?: 'user' | 'admin'
   emailVerified?: boolean
   image?: string | null
   bio?: string | null

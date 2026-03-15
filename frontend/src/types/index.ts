@@ -24,6 +24,77 @@ export interface Order {
   shippingAddress: Address
 }
 
+export type PodRentalStatus = 'requested' | 'contact_scheduled' | 'renting' | 'completed' | 'cancelled'
+export type BuildingApplicationStatus = 'submitted' | 'reviewing' | 'approved' | 'rejected'
+
+export interface PodRentalRequest {
+  pod_plan_id: 'starter' | 'standard' | 'premium'
+  full_name: string
+  email: string
+  phone: string
+  installation_address: string
+  city: string
+  state: string
+  zip_code: string
+  preferred_start_date: string
+  rental_term_months: number
+  building_name?: string
+  location_type: string
+  growing_goals?: string
+  notes?: string
+  terms_accepted: boolean
+}
+
+export interface PodRental {
+  id: string
+  user_id: string
+  pod_plan_id: 'starter' | 'standard' | 'premium'
+  pod_name: string
+  pod_size: 'small' | 'medium' | 'large'
+  monthly_price: number
+  installation_fee: number
+  status: PodRentalStatus
+  full_name: string
+  email: string
+  phone: string
+  installation_address: string
+  city: string
+  state: string
+  zip_code: string
+  preferred_start_date: string
+  rental_term_months: number
+  building_name?: string | null
+  location_type: string
+  growing_goals?: string | null
+  notes?: string | null
+  terms_accepted: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface PodRentalResponse {
+  rental: PodRental
+  email_delivered: boolean
+  message: string
+}
+
+export interface OrderHistoryItem {
+  id: string
+  type: 'product' | 'pod_rental'
+  title: string
+  subtitle: string
+  status: string
+  created_at: string
+  total?: number
+  monthly_price?: number
+  installation_fee?: number
+  pod_size?: string
+  preferred_start_date?: string
+  rental_term_months?: number
+  item_count?: number
+  details: Record<string, string>
+}
+
 export interface Address {
   fullName: string
   street: string
@@ -38,6 +109,7 @@ export interface User {
   id: string
   email: string
   name: string
+  role?: 'user' | 'admin'
   address?: Address
 }
 
@@ -49,4 +121,28 @@ export interface BuildingApplicationPayload {
   building_type: string
   space_size: string
   additional_info?: string
+}
+
+export interface BuildingApplicationRecord extends BuildingApplicationPayload {
+  id: string
+  user_id: string
+  user_email: string
+  status: BuildingApplicationStatus
+  created_at: string
+  updated_at: string
+}
+
+export interface AdminMetrics {
+  products: number
+  pod_rentals: number
+  building_applications: number
+  pending_pod_rentals: number
+  pending_applications: number
+}
+
+export interface AdminDashboardData {
+  metrics: AdminMetrics
+  products: Product[]
+  pod_rentals: PodRental[]
+  building_applications: BuildingApplicationRecord[]
 }
