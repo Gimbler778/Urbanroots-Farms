@@ -464,7 +464,7 @@ async def sign_up(
             email=data.email,
             passwordHash=hash_password(data.password),
             emailVerified=False,
-            role="admin" if data.email.lower() == settings.admin_email.lower() else "user",
+            role="user",
         )
         db.add(user)
 

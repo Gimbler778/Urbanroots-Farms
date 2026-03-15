@@ -1,5 +1,7 @@
 import axios from 'axios'
 import type {
+  AdminProductCreatePayload,
+  AdminProductUpdatePayload,
   Product,
   Order,
   User,
@@ -92,12 +94,12 @@ export const updateAdminBuildingApplicationStatus = async (id: string, status: B
   return response.data
 }
 
-export const createAdminProduct = async (payload: Partial<Product>) => {
+export const createAdminProduct = async (payload: AdminProductCreatePayload) => {
   const response = await api.post<Product>('/admin/products', payload)
   return response.data
 }
 
-export const updateAdminProduct = async (id: string, payload: Partial<Product>) => {
+export const updateAdminProduct = async (id: string, payload: AdminProductUpdatePayload) => {
   const response = await api.put<Product>(`/admin/products/${id}`, payload)
   return response.data
 }

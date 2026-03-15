@@ -10,6 +10,19 @@ export interface Product {
   unit: string
 }
 
+export interface AdminProductCreatePayload {
+  name: string
+  description: string
+  price: number
+  image: string
+  category: string
+  stock: number
+  organic: boolean
+  unit: string
+}
+
+export type AdminProductUpdatePayload = Partial<AdminProductCreatePayload>
+
 export interface CartItem {
   product: Product
   quantity: number
