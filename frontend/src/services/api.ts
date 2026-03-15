@@ -1,5 +1,17 @@
 import axios from 'axios'
-import type { Product, Order, User, BuildingApplicationPayload } from '@/types'
+import type {
+  Product,
+  Order,
+  User,
+  BuildingApplicationPayload,
+  BuildingApplicationRecord,
+  OrderHistoryItem,
+  PodRentalRequest,
+  PodRentalResponse,
+  AdminDashboardData,
+  BuildingApplicationStatus,
+  PodRentalStatus,
+} from '@/types'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
 
@@ -8,6 +20,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true,
 })
 
 // Products
@@ -52,6 +65,45 @@ export const updateUser = async (userData: Partial<User>) => {
 export const submitBuildingApplication = async (payload: BuildingApplicationPayload) => {
   const response = await api.post<{ message: string }>('/applications', payload, { withCredentials: true })
   return response.data
+}
+
+export const createPodRental = async (payload: PodRentalRequest) => {
+  const response = await api.post<PodRentalResponse>('/pod-rentals', payload)
+  return response.data
+}
+
+export const getMyOrders = async () => {
+  const response = await api.get<OrderHistoryItem[]>('/my-orders')
+  return response.data
+}
+
+export const getAdminDashboard = async () => {
+  const response = await api.get<AdminDashboardData>('/admin/dashboard')
+  return response.data
+}
+
+export const updateAdminPodRentalStatus = async (id: string, status: PodRentalStatus) => {
+  const response = await api.patch<PodRentalResponse['rental']>(`/admin/pod-rentals/${id}`, { status })
+  return response.data
+}
+
+export const updateAdminBuildingApplicationStatus = async (id: string, status: BuildingApplicationStatus) => {
+  const response = await api.patch<BuildingApplicationRecord>(`/admin/building-applications/${id}`, { status })
+  return response.data
+}
+
+export const createAdminProduct = async (payload: Partial<Product>) => {
+  const response = await api.post<Product>('/admin/products', payload)
+  return response.data
+}
+
+export const updateAdminProduct = async (id: string, payload: Partial<Product>) => {
+  const response = await api.put<Product>(`/admin/products/${id}`, payload)
+  return response.data
+}
+
+export const deleteAdminProduct = async (id: string) => {
+  await api.delete(`/admin/products/${id}`)
 }
 
 export default api

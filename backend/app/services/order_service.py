@@ -86,3 +86,55 @@ class OrderService:
             db.commit()
             db.refresh(db_order)
         return db_order
+
+    @staticmethod
+    def create_order_for_user(db: Session, order: OrderCreate, user_id: Optional[str]) -> Order:
+        total = 0
+        items_to_create = []
+
+        for item_data in order.items:
+            product = db.query(Product).filter(
+                Product.id == item_data["product"]["id"]
+            ).first()
+
+            if not product:
+                raise ValueError(f"Product {item_data['product']['id']} not found")
+
+            if product.stock < item_data["quantity"]:
+                raise ValueError(f"Insufficient stock for {product.name}")
+
+            item_total = product.price * item_data["quantity"]
+            total += item_total
+
+            items_to_create.append({
+                "product_id": product.id,
+                "quantity": item_data["quantity"],
+                "price": product.price
+            })
+
+            product.stock -= item_data["quantity"]
+
+        db_order = Order(
+            user_id=user_id,
+            total=total,
+            full_name=order.shipping_address.full_name,
+            street=order.shipping_address.street,
+            city=order.shipping_address.city,
+            state=order.shipping_address.state,
+            zip_code=order.shipping_address.zip_code,
+            country=order.shipping_address.country,
+            phone=order.shipping_address.phone
+        )
+        db.add(db_order)
+        db.flush()
+
+        for item_data in items_to_create:
+            db_item = OrderItem(
+                order_id=db_order.id,
+                **item_data
+            )
+            db.add(db_item)
+
+        db.commit()
+        db.refresh(db_order)
+        return db_order

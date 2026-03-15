@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Menu, X, User, ShoppingCart, Pencil, LogOut } from 'lucide-react'
+import { Menu, X, User, ShoppingCart, Pencil, LogOut, ReceiptText, Settings2 } from 'lucide-react'
 import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
@@ -61,7 +61,7 @@ export default function Navbar() {
             <UrbanRootsLogo className="w-12 h-12 text-primary" />
             <span className="text-xl font-bold pb-1">
               <span className="text-primary">UrbanRoots</span>
-              <span className="text-[hsl(var(--earth-brown))]" style={{ marginLeft: '0.25rem' }}>Farms</span>
+              <span className="ml-1 text-[hsl(var(--earth-brown))]">Farms</span>
             </span>
           </Link>
 
@@ -137,6 +137,24 @@ export default function Navbar() {
                         />
                         <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">{user.name}</p>
                       </div>
+
+                      <button
+                        onClick={() => { setShowDropdown(false); navigate('/my-orders') }}
+                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                      >
+                        <ReceiptText className="w-4 h-4" />
+                        My Orders
+                      </button>
+
+                      {user.role === 'admin' ? (
+                        <button
+                          onClick={() => { setShowDropdown(false); navigate('/admin') }}
+                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                        >
+                          <Settings2 className="w-4 h-4" />
+                          Admin Dashboard
+                        </button>
+                      ) : null}
 
                       <button
                         onClick={() => { setShowDropdown(false); navigate('/profile') }}
@@ -243,6 +261,24 @@ export default function Navbar() {
                     />
                     <span className="text-sm font-semibold text-gray-800 dark:text-gray-100">{user.name}</span>
                   </div>
+                  <Link
+                    to="/my-orders"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-foreground/70 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10 transition-all"
+                  >
+                    <ReceiptText className="w-4 h-4" />
+                    My Orders
+                  </Link>
+                  {user.role === 'admin' ? (
+                    <Link
+                      to="/admin"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-foreground/70 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10 transition-all"
+                    >
+                      <Settings2 className="w-4 h-4" />
+                      Admin Dashboard
+                    </Link>
+                  ) : null}
                   <Link
                     to="/profile"
                     onClick={() => setIsOpen(false)}

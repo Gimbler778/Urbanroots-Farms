@@ -1,11 +1,25 @@
-from fastapi import APIRouter, Depends, HTTPException
+from datetime import datetime, timezone
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from typing import List
 from app.core.database import get_db
+from app.models import User, Session as AuthSession
 from app.schemas import Order, OrderCreate, OrderUpdate
 from app.services.order_service import OrderService
 
 router = APIRouter(prefix="/orders", tags=["orders"])
+
+
+def get_optional_current_user(request: Request, db: Session) -> User | None:
+    session_token = request.cookies.get("better-auth.session_token")
+    if not session_token:
+        return None
+
+    session = db.query(AuthSession).filter(AuthSession.id == session_token).first()
+    if not session or session.expiresAt < datetime.now(timezone.utc):
+        return None
+
+    return db.query(User).filter(User.id == session.userId).first()
 
 
 @router.get("/", response_model=List[Order])
@@ -29,10 +43,11 @@ def get_order(order_id: str, db: Session = Depends(get_db)):
 
 
 @router.post("/", response_model=Order, status_code=201)
-def create_order(order: OrderCreate, db: Session = Depends(get_db)):
+def create_order(order: OrderCreate, request: Request, db: Session = Depends(get_db)):
     """Create a new order"""
     try:
-        return OrderService.create_order(db, order)
+        user = get_optional_current_user(request, db)
+        return OrderService.create_order_for_user(db, order, user.id if user else None)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
