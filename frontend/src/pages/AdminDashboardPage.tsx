@@ -19,6 +19,7 @@ import {
   updateAdminProduct,
 } from '@/services/api'
 import type {
+  AdminProductCreatePayload,
   AdminDashboardData,
   BuildingApplicationStatus,
   PodRentalStatus,
@@ -32,7 +33,8 @@ export default function AdminDashboardPage() {
   const [fetching, setFetching] = useState(true)
   const [savingId, setSavingId] = useState<string | null>(null)
   const [error, setError] = useState('')
-  const [newProduct, setNewProduct] = useState<Partial<Product>>({
+  const [productDrafts, setProductDrafts] = useState<Record<string, { stock: number; price: number }>>({})
+  const [newProduct, setNewProduct] = useState<AdminProductCreatePayload>({
     name: '',
     description: '',
     price: 0,
@@ -42,6 +44,13 @@ export default function AdminDashboardPage() {
     organic: true,
     unit: 'pcs',
   })
+
+  const canCreateProduct =
+    newProduct.name.trim().length > 0 &&
+    newProduct.description.trim().length > 0 &&
+    newProduct.image.trim().length > 0 &&
+    newProduct.price > 0 &&
+    newProduct.stock >= 0
 
   useEffect(() => {
     if (!loading && !user) {
@@ -71,6 +80,18 @@ export default function AdminDashboardPage() {
       loadDashboard()
     }
   }, [user?.role])
+
+  useEffect(() => {
+    if (!dashboard) {
+      return
+    }
+    setProductDrafts(
+      dashboard.products.reduce<Record<string, { stock: number; price: number }>>((accumulator, product) => {
+        accumulator[product.id] = { stock: product.stock, price: product.price }
+        return accumulator
+      }, {})
+    )
+  }, [dashboard])
 
   const metrics = useMemo(() => {
     return dashboard?.metrics ?? {
@@ -103,6 +124,11 @@ export default function AdminDashboardPage() {
   }
 
   const handleCreateProduct = async () => {
+    if (!canCreateProduct) {
+      setError('Please complete all product fields and use a positive price.')
+      return
+    }
+
     setSavingId('create-product')
     try {
       await createAdminProduct(newProduct)
@@ -132,10 +158,17 @@ export default function AdminDashboardPage() {
     }
   }
 
-  const handleUpdateProductQuick = async (product: Product, stock: number, price: number) => {
+  const handleUpdateProductQuick = async (product: Product) => {
+    const draft = productDrafts[product.id] ?? { stock: product.stock, price: product.price }
+
+    if (draft.stock < 0 || draft.price <= 0) {
+      setError('Stock must be 0 or more, and price must be greater than 0.')
+      return
+    }
+
     setSavingId(product.id)
     try {
-      await updateAdminProduct(product.id, { stock, price })
+      await updateAdminProduct(product.id, { stock: draft.stock, price: draft.price })
       await loadDashboard()
     } finally {
       setSavingId(null)
@@ -304,6 +337,9 @@ export default function AdminDashboardPage() {
                   {dashboard?.products.map((product) => (
                     <Card key={product.id}>
                       <CardContent className="p-4">
+                        {(() => {
+                          const draft = productDrafts[product.id] ?? { stock: product.stock, price: product.price }
+                          return (
                         <div className="grid gap-3 md:grid-cols-[1.5fr_1fr_1fr_auto_auto] md:items-center">
                           <div>
                             <div className="font-semibold">{product.name}</div>
@@ -311,25 +347,42 @@ export default function AdminDashboardPage() {
                           </div>
                           <Input
                             type="number"
-                            defaultValue={product.stock}
-                            onBlur={(event) => {
+                            min={0}
+                            value={draft.stock}
+                            onChange={(event) => {
                               const stock = Number(event.target.value)
-                              handleUpdateProductQuick(product, stock, product.price)
+                              setProductDrafts((current) => ({
+                                ...current,
+                                [product.id]: {
+                                  ...draft,
+                                  stock: Number.isFinite(stock) ? stock : 0,
+                                },
+                              }))
                             }}
                           />
                           <Input
                             type="number"
-                            defaultValue={product.price}
-                            onBlur={(event) => {
+                            min={0}
+                            step="0.01"
+                            value={draft.price}
+                            onChange={(event) => {
                               const price = Number(event.target.value)
-                              handleUpdateProductQuick(product, product.stock, price)
+                              setProductDrafts((current) => ({
+                                ...current,
+                                [product.id]: {
+                                  ...draft,
+                                  price: Number.isFinite(price) ? price : 0,
+                                },
+                              }))
                             }}
                           />
-                          <Button variant="outline" disabled={savingId === product.id}>Save</Button>
+                          <Button variant="outline" onClick={() => handleUpdateProductQuick(product)} disabled={savingId === product.id}>Save</Button>
                           <Button variant="destructive" onClick={() => handleDeleteProduct(product.id)} disabled={savingId === product.id}>
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
+                          )
+                        })()}
                       </CardContent>
                     </Card>
                   ))}

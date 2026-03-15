@@ -34,11 +34,11 @@ def ensure_runtime_schema() -> None:
             with engine.begin() as connection:
                 connection.execute(text("ALTER TABLE \"user\" ADD COLUMN role VARCHAR DEFAULT 'user'"))
 
-        if settings.admin_email:
+        if settings.bootstrap_admin_on_startup and settings.bootstrap_admin_email:
             with engine.begin() as connection:
                 connection.execute(
                     text("UPDATE \"user\" SET role = 'admin' WHERE lower(email) = lower(:admin_email)"),
-                    {"admin_email": settings.admin_email},
+                    {"admin_email": settings.bootstrap_admin_email},
                 )
 
 def get_db():

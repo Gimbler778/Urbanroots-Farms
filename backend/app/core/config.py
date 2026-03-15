@@ -17,6 +17,8 @@ class Settings(BaseSettings):
     mail_starttls: bool = True
     mail_ssl_tls: bool = False
     admin_email: str = "urbanrootsfarms2000@gmail.com"
+    bootstrap_admin_on_startup: bool = False
+    bootstrap_admin_email: str = ""
 
     # ---------------- AUTH ---------------- #
     secret_key: str = "change-me"
