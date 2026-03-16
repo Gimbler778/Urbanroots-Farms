@@ -108,4 +108,10 @@ export const deleteAdminProduct = async (id: string) => {
   await api.delete(`/admin/products/${id}`)
 }
 
+// FarmBot chat
+export const chatWithFarmBot = async (messages: { role: string; content: string }[]) => {
+  const response = await api.post<{ reply: string }>('/farmbot/chat', { messages })
+  return response.data.reply
+}
+
 export default api

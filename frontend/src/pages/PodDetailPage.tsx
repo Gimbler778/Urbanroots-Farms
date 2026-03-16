@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { ArrowLeft, CalendarDays, Leaf, Ruler, Sprout, Star } from 'lucide-react'
 import Layout from '@/components/Layout'
 import PodRentalDialog from '@/components/PodRentalDialog'
+import FarmBotDialog from '@/components/FarmBotDialog'
 import GlowCard from '@/components/GlowCard'
 import ScrollReveal from '@/components/ScrollReveal'
 import { Button } from '@/components/ui/button'
@@ -16,6 +17,7 @@ export default function PodDetailPage() {
   const navigate = useNavigate()
   const [selectedImage, setSelectedImage] = useState(0)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [farmBotOpen, setFarmBotOpen] = useState(false)
 
   const pod = podId ? podPlansBySlug[podId] : undefined
 
@@ -113,8 +115,8 @@ export default function PodDetailPage() {
                     <CalendarDays className="mr-2 h-5 w-5" />
                     Choose Plan
                   </Button>
-                  <Button variant="outline" size="lg" className="flex-1" onClick={() => navigate('/apply-for-building')}>
-                    Talk to Expert
+                  <Button variant="outline" size="lg" className="flex-1" onClick={() => setFarmBotOpen(true)}>
+                    Talk to FarmBot
                   </Button>
                 </div>
               </div>
@@ -204,6 +206,7 @@ export default function PodDetailPage() {
       </section>
 
       <PodRentalDialog open={dialogOpen} onOpenChange={setDialogOpen} pod={pod} />
+      <FarmBotDialog open={farmBotOpen} onOpenChange={setFarmBotOpen} />
     </Layout>
   )
 }

@@ -25,6 +25,10 @@ class Settings(BaseSettings):
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
 
+    # ---------------- CLOUDFLARE WORKERS AI ---------------- #
+    cloudflare_account_id: str = ""
+    cloudflare_api_token: str = ""
+
     # ---------------- CORS ---------------- #
     frontend_url: str = "http://localhost:3001"
     allowed_origins: str = (
