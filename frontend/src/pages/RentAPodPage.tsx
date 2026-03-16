@@ -3,6 +3,7 @@ import Layout from '@/components/Layout'
 import ScrollReveal from '@/components/ScrollReveal'
 import GlowCard from '@/components/GlowCard'
 import PodRentalDialog from '@/components/PodRentalDialog'
+import FarmBotDialog from '@/components/FarmBotDialog'
 import { Link } from 'react-router-dom'
 import { 
   Leaf, Package, Wrench, Check, 
@@ -16,6 +17,7 @@ import { podPlans, type PodPlan } from '@/data/podPlans'
 
 export default function RentAPodPage() {
   const [selectedPod, setSelectedPod] = useState<PodPlan | null>(null)
+  const [farmBotOpen, setFarmBotOpen] = useState(false)
 
   return (
     <Layout>
@@ -560,15 +562,14 @@ export default function RentAPodPage() {
                     Subscribe Now
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
-                  <Link to="/apply-for-building">
-                    <Button 
-                      variant="outline" 
-                      size="lg" 
-                      className="text-lg px-10 py-6 rounded-xl border-2"
-                    >
-                      Talk to Expert
-                    </Button>
-                  </Link>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="text-lg px-10 py-6 rounded-xl border-2"
+                    onClick={() => setFarmBotOpen(true)}
+                  >
+                    Talk to FarmBot
+                  </Button>
                 </div>
                 <p className="text-sm text-muted-foreground pt-4">
                   💚 30-day money-back guarantee • 🌱 Cancel anytime • 🚀 Setup in 24 hours
@@ -581,6 +582,7 @@ export default function RentAPodPage() {
       </section>
 
       <PodRentalDialog open={Boolean(selectedPod)} onOpenChange={(open) => { if (!open) setSelectedPod(null) }} pod={selectedPod} />
+      <FarmBotDialog open={farmBotOpen} onOpenChange={setFarmBotOpen} />
     </Layout>
   )
 }

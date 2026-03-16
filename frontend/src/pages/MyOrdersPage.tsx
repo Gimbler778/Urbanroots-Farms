@@ -7,7 +7,7 @@ import ScrollReveal from '@/components/ScrollReveal'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { getMyOrders } from '@/services/api'
+import { cancelPodRental, getMyOrders } from '@/services/api'
 import { useAuth } from '@/hooks/useAuth'
 import type { OrderHistoryItem } from '@/types'
 
@@ -21,6 +21,7 @@ const statusTone: Record<string, string> = {
   renting: 'bg-emerald-100 text-emerald-700',
   completed: 'bg-emerald-100 text-emerald-700',
   cancelled: 'bg-rose-100 text-rose-700',
+  refund_pending: 'bg-orange-100 text-orange-700',
 }
 
 export default function MyOrdersPage() {
@@ -29,6 +30,23 @@ export default function MyOrdersPage() {
   const [orders, setOrders] = useState<OrderHistoryItem[]>([])
   const [fetching, setFetching] = useState(true)
   const [error, setError] = useState('')
+  const [actionMessage, setActionMessage] = useState('')
+  const [cancellingId, setCancellingId] = useState<string | null>(null)
+  const [confirmCancelOrder, setConfirmCancelOrder] = useState<OrderHistoryItem | null>(null)
+  const [cancelSuccessMessage, setCancelSuccessMessage] = useState('')
+
+  const loadOrders = async () => {
+    setFetching(true)
+    setError('')
+    try {
+      const response = await getMyOrders()
+      setOrders(response)
+    } catch (requestError: any) {
+      setError(requestError?.response?.data?.detail || 'Unable to load your order history right now.')
+    } finally {
+      setFetching(false)
+    }
+  }
 
   useEffect(() => {
     if (!loading && !user) {
@@ -41,26 +59,32 @@ export default function MyOrdersPage() {
       return
     }
 
-    const loadOrders = async () => {
-      setFetching(true)
-      setError('')
-      try {
-        const response = await getMyOrders()
-        setOrders(response)
-      } catch (requestError: any) {
-        setError(requestError?.response?.data?.detail || 'Unable to load your order history right now.')
-      } finally {
-        setFetching(false)
-      }
-    }
-
     loadOrders()
   }, [user])
 
+  const handleCancelSubscription = async (rentalId: string) => {
+
+    setCancellingId(rentalId)
+    setActionMessage('')
+    try {
+      const result = await cancelPodRental(rentalId)
+      setCancelSuccessMessage(result.message)
+      setActionMessage('')
+      await loadOrders()
+    } catch (requestError: any) {
+      setActionMessage(requestError?.response?.data?.detail || 'Unable to cancel this subscription right now.')
+    } finally {
+      setCancellingId(null)
+    }
+  }
+
+  const isCancelledStatus = (status: string) => status === 'cancelled' || status === 'refund_pending'
+
   const counts = useMemo(() => ({
     all: orders.length,
-    pod: orders.filter((item) => item.type === 'pod_rental').length,
+    pod: orders.filter((item) => item.type === 'pod_rental' && !isCancelledStatus(item.status)).length,
     product: orders.filter((item) => item.type === 'product').length,
+    cancelled: orders.filter((item) => isCancelledStatus(item.status)).length,
   }), [orders])
 
   const renderOrders = (items: OrderHistoryItem[]) => {
@@ -151,6 +175,19 @@ export default function MyOrdersPage() {
                     </div>
                   ))}
                 </div>
+
+                {order.type === 'pod_rental' && ['requested', 'contact_scheduled', 'renting'].includes(order.status) ? (
+                  <div className="mt-4 flex justify-end">
+                    <Button
+                      variant="outline"
+                      className="border-rose-200 text-rose-700 hover:bg-rose-50"
+                      disabled={cancellingId === order.id}
+                      onClick={() => setConfirmCancelOrder(order)}
+                    >
+                      {cancellingId === order.id ? 'Cancelling...' : 'Cancel Subscription'}
+                    </Button>
+                  </div>
+                ) : null}
               </CardContent>
             </GlowCard>
           </ScrollReveal>
@@ -178,6 +215,7 @@ export default function MyOrdersPage() {
             {[
               { label: 'All records', value: counts.all, icon: ReceiptText },
               { label: 'Pod rentals', value: counts.pod, icon: Sprout },
+              { label: 'Cancelled orders', value: counts.cancelled, icon: ReceiptText },
               { label: 'Product orders', value: counts.product, icon: Package2 },
             ].map((item) => (
               <div key={item.label} className="rounded-[24px] border border-primary/10 bg-white/85 p-5 shadow-sm backdrop-blur-sm">
@@ -192,14 +230,22 @@ export default function MyOrdersPage() {
 
       <section className="py-12">
         <div className="container mx-auto px-4">
+          {actionMessage ? (
+            <Card className="mb-6 border-primary/20 bg-primary/5">
+              <CardContent className="p-4 text-sm text-foreground">{actionMessage}</CardContent>
+            </Card>
+          ) : null}
+
           <Tabs defaultValue="all" className="space-y-6">
             <TabsList className="h-auto rounded-2xl bg-muted/60 p-1">
               <TabsTrigger value="all">All Orders</TabsTrigger>
               <TabsTrigger value="pod">Pod Rentals</TabsTrigger>
+              <TabsTrigger value="cancelled">Cancelled Orders</TabsTrigger>
               <TabsTrigger value="product">Product Orders</TabsTrigger>
             </TabsList>
             <TabsContent value="all">{renderOrders(orders)}</TabsContent>
-            <TabsContent value="pod">{renderOrders(orders.filter((item) => item.type === 'pod_rental'))}</TabsContent>
+            <TabsContent value="pod">{renderOrders(orders.filter((item) => item.type === 'pod_rental' && !isCancelledStatus(item.status)))}</TabsContent>
+            <TabsContent value="cancelled">{renderOrders(orders.filter((item) => isCancelledStatus(item.status)))}</TabsContent>
             <TabsContent value="product">{renderOrders(orders.filter((item) => item.type === 'product'))}</TabsContent>
           </Tabs>
 
@@ -225,6 +271,54 @@ export default function MyOrdersPage() {
           </Card>
         </div>
       </section>
+
+      {confirmCancelOrder ? (
+        <div className="fixed inset-0 z-[140] flex items-center justify-center px-4">
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/45 backdrop-blur-sm"
+            onClick={() => setConfirmCancelOrder(null)}
+            aria-label="Close cancel dialog"
+          />
+          <div className="relative z-10 w-full max-w-md rounded-3xl border border-white/40 bg-background/95 p-6 shadow-2xl">
+            <h3 className="text-2xl font-bold">Cancel subscription?</h3>
+            <p className="mt-3 text-sm text-muted-foreground">
+              {confirmCancelOrder.title} will move to cancelled orders. Refund will be processed shortly.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <Button variant="outline" onClick={() => setConfirmCancelOrder(null)}>Keep Subscription</Button>
+              <Button
+                className="bg-rose-600 text-white hover:bg-rose-700"
+                onClick={async () => {
+                  const id = confirmCancelOrder.id
+                  setConfirmCancelOrder(null)
+                  await handleCancelSubscription(id)
+                }}
+              >
+                Confirm Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {cancelSuccessMessage ? (
+        <div className="fixed inset-0 z-[145] flex items-center justify-center px-4">
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/35 backdrop-blur-sm"
+            onClick={() => setCancelSuccessMessage('')}
+            aria-label="Close success dialog"
+          />
+          <div className="relative z-10 w-full max-w-md rounded-3xl border border-primary/20 bg-background/95 p-6 shadow-2xl">
+            <h3 className="text-2xl font-bold text-primary">Subscription Cancelled</h3>
+            <p className="mt-3 text-sm text-muted-foreground">{cancelSuccessMessage}</p>
+            <div className="mt-6 flex justify-end">
+              <Button onClick={() => setCancelSuccessMessage('')}>Okay</Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </Layout>
   )
 }

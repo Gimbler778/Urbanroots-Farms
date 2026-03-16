@@ -7,6 +7,7 @@ from app.api.routes import auth, products, orders
 from app.api.routes import applications
 from app.api.routes import pod_rentals
 from app.api.routes import admin
+from app.api.routes import farmbot
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -40,6 +41,7 @@ app.include_router(orders.router, prefix="/api/orders", tags=["orders"])
 app.include_router(applications.router, prefix="/api", tags=["applications"])
 app.include_router(pod_rentals.router, prefix="/api", tags=["pod-rentals"])
 app.include_router(admin.router, prefix="/api", tags=["admin"])
+app.include_router(farmbot.router, prefix="/api", tags=["farmbot"])
 
 @app.get("/")
 async def root():

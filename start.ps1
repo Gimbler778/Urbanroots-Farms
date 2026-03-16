@@ -16,7 +16,7 @@ if (!(Get-Command python -ErrorAction SilentlyContinue)) {
 
 # Start Backend
 Write-Host "`n📦 Starting Backend API..." -ForegroundColor Cyan
-Start-Process pwsh -ArgumentList "-NoExit", "-Command", "cd 'backend'; .\venv\Scripts\Activate.ps1; python main.py"
+Start-Process pwsh -ArgumentList "-NoExit", "-Command", "cd 'backend'; & '.\venv\Scripts\python.exe' -m uvicorn main:app --reload"
 
 # Wait a bit for backend to start
 Start-Sleep -Seconds 3

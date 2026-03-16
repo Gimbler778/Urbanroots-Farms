@@ -29,7 +29,8 @@ const initialFormState = (podId: PodRentalRequest['pod_plan_id'] = 'standard'): 
   full_name: '',
   email: '',
   phone: '',
-  installation_address: '',
+  street_name: '',
+  house_number: '',
   city: '',
   state: '',
   zip_code: '',
@@ -43,6 +44,47 @@ const initialFormState = (podId: PodRentalRequest['pod_plan_id'] = 'standard'): 
 })
 
 const stepLabels = ['Your Details', 'Installation Plan', 'Review & Submit']
+
+// Validation helpers
+const validateEmail = (email: string): boolean => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
+const validatePhone = (phone: string): boolean => {
+  // Remove non-digit characters and check length (10+ digits)
+  const digits = phone.replace(/\D/g, '')
+  return digits.length >= 10
+}
+
+const validateZipCode = (zip: string): boolean => {
+  return /^\d{5,6}$/.test(zip)
+}
+
+const validateFormStep = (stepIndex: number, form: FormState): string[] => {
+  const errors: string[] = []
+  
+  if (stepIndex === 0) {
+    // Step 1: Your Details
+    if (!form.full_name.trim()) errors.push('Full name is required')
+    if (!form.email.trim()) errors.push('Email is required')
+    else if (!validateEmail(form.email)) errors.push('Please enter a valid email')
+    if (!form.phone.trim()) errors.push('Phone is required')
+    else if (!validatePhone(form.phone)) errors.push('Phone must have at least 10 digits')
+  } else if (stepIndex === 1) {
+    // Step 2: Installation Plan
+    if (!form.street_name.trim()) errors.push('Street name is required')
+    if (!form.house_number.trim()) errors.push('House number is required')
+    if (!form.city.trim()) errors.push('City is required')
+    if (!form.state.trim()) errors.push('State is required')
+    if (!form.zip_code.trim()) errors.push('Zip code is required')
+    else if (!validateZipCode(form.zip_code)) errors.push('Zip code must be 5-6 digits')
+  } else if (stepIndex === 2) {
+    // Step 3: Review
+    if (!form.terms_accepted) errors.push('You must accept the terms and conditions')
+  }
+  
+  return errors
+}
 
 export default function PodRentalDialog({ open, onOpenChange, pod }: PodRentalDialogProps) {
   const navigate = useNavigate()
@@ -87,12 +129,13 @@ export default function PodRentalDialog({ open, onOpenChange, pod }: PodRentalDi
   const requiredFieldChecks = useMemo(
     () => [
       Boolean(form.full_name.trim()),
-      Boolean(form.email.trim()),
-      Boolean(form.phone.trim()),
-      Boolean(form.installation_address.trim()),
+      Boolean(form.email.trim()) && validateEmail(form.email),
+      Boolean(form.phone.trim()) && validatePhone(form.phone),
+      Boolean(form.street_name.trim()),
+      Boolean(form.house_number.trim()),
       Boolean(form.city.trim()),
       Boolean(form.state.trim()),
-      Boolean(form.zip_code.trim()),
+      Boolean(form.zip_code.trim()) && validateZipCode(form.zip_code),
       Boolean(form.preferred_start_date),
       Boolean(form.location_type.trim()),
       Boolean(form.rental_term_months),
@@ -118,31 +161,11 @@ export default function PodRentalDialog({ open, onOpenChange, pod }: PodRentalDi
   }
 
   const validateStep = () => {
-    if (step === 0) {
-      if (!form.full_name.trim() || !form.email.trim() || !form.phone.trim()) {
-        setError('Fill in your name, email, and phone number before continuing.')
-        return false
-      }
-    }
-
-    if (step === 1) {
-      if (
-        !form.installation_address.trim() ||
-        !form.city.trim() ||
-        !form.state.trim() ||
-        !form.zip_code.trim() ||
-        !form.preferred_start_date
-      ) {
-        setError('Complete the installation address and preferred start date before continuing.')
-        return false
-      }
-    }
-
-    if (step === 2 && !form.terms_accepted) {
-      setError('Accept the terms to start your rental request.')
+    const errors = validateFormStep(step, form)
+    if (errors.length > 0) {
+      setError(errors[0])
       return false
     }
-
     setError('')
     return true
   }
@@ -379,15 +402,13 @@ export default function PodRentalDialog({ open, onOpenChange, pod }: PodRentalDi
 
                     {step === 1 ? (
                       <div className="grid gap-4 md:grid-cols-2">
-                        <div className="md:col-span-2">
-                          <label className="mb-2 block text-sm font-medium">Installation address</label>
-                          <textarea
-                            value={form.installation_address}
-                            onChange={(event) => updateField('installation_address', event.target.value)}
-                            rows={3}
-                            placeholder="Street address, floor, rooftop, or installation note"
-                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                          />
+                        <div>
+                          <label className="mb-2 block text-sm font-medium">Street name</label>
+                          <Input value={form.street_name} onChange={(event) => updateField('street_name', event.target.value)} placeholder="Street name" />
+                        </div>
+                        <div>
+                          <label className="mb-2 block text-sm font-medium">House number</label>
+                          <Input value={form.house_number} onChange={(event) => updateField('house_number', event.target.value)} placeholder="House / Apt number" />
                         </div>
                         <div>
                           <label className="mb-2 block text-sm font-medium">City</label>
@@ -465,7 +486,7 @@ export default function PodRentalDialog({ open, onOpenChange, pod }: PodRentalDi
                           <div className="rounded-2xl border p-4">
                             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Installation</p>
                             <p className="mt-2 font-medium">{form.location_type}</p>
-                            <p className="text-sm text-muted-foreground">{form.installation_address}</p>
+                            <p className="text-sm text-muted-foreground">{form.street_name}, {form.house_number}</p>
                             <p className="text-sm text-muted-foreground">{form.city}, {form.state} {form.zip_code}</p>
                           </div>
                         </div>

@@ -79,6 +79,11 @@ export const getMyOrders = async () => {
   return response.data
 }
 
+export const cancelPodRental = async (id: string) => {
+  const response = await api.post<PodRentalResponse>(`/pod-rentals/${id}/cancel`)
+  return response.data
+}
+
 export const getAdminDashboard = async () => {
   const response = await api.get<AdminDashboardData>('/admin/dashboard')
   return response.data
@@ -106,6 +111,12 @@ export const updateAdminProduct = async (id: string, payload: AdminProductUpdate
 
 export const deleteAdminProduct = async (id: string) => {
   await api.delete(`/admin/products/${id}`)
+}
+
+// FarmBot chat
+export const chatWithFarmBot = async (messages: { role: string; content: string }[]) => {
+  const response = await api.post<{ reply: string }>('/farmbot/chat', { messages })
+  return response.data.reply
 }
 
 export default api
