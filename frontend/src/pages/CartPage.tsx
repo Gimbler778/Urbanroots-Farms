@@ -4,11 +4,50 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/hooks/useAuth';
 import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft } from 'lucide-react';
 
 export default function CartPage() {
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
   const { cart, removeFromCart, updateQuantity, clearCart, getCartTotal } = useCart();
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="container mx-auto px-4 py-16">
+          <Card className="max-w-md mx-auto text-center">
+            <CardContent className="p-8 text-muted-foreground">Checking your session...</CardContent>
+          </Card>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!user) {
+    return (
+      <Layout>
+        <div className="container mx-auto px-4 py-16">
+          <Card className="max-w-md mx-auto text-center">
+            <CardHeader>
+              <div className="flex justify-center mb-4">
+                <ShoppingBag className="h-16 w-16 text-muted-foreground" />
+              </div>
+              <CardTitle className="text-2xl">Login to Access the Cart</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-6">
+                Please sign in to view your cart and continue checkout.
+              </p>
+              <Button onClick={() => navigate('/sign-in')} size="lg">
+                Go to Sign In
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </Layout>
+    );
+  }
 
   if (cart.length === 0) {
     return (

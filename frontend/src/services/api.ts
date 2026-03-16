@@ -79,6 +79,11 @@ export const getMyOrders = async () => {
   return response.data
 }
 
+export const cancelPodRental = async (id: string) => {
+  const response = await api.post<PodRentalResponse>(`/pod-rentals/${id}/cancel`)
+  return response.data
+}
+
 export const getAdminDashboard = async () => {
   const response = await api.get<AdminDashboardData>('/admin/dashboard')
   return response.data

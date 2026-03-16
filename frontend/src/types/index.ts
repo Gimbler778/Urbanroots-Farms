@@ -37,7 +37,7 @@ export interface Order {
   shippingAddress: Address
 }
 
-export type PodRentalStatus = 'requested' | 'contact_scheduled' | 'renting' | 'completed' | 'cancelled'
+export type PodRentalStatus = 'requested' | 'contact_scheduled' | 'renting' | 'completed' | 'cancelled' | 'refund_pending'
 export type BuildingApplicationStatus = 'submitted' | 'reviewing' | 'approved' | 'rejected'
 
 export interface PodRentalRequest {
@@ -45,7 +45,8 @@ export interface PodRentalRequest {
   full_name: string
   email: string
   phone: string
-  installation_address: string
+  street_name: string
+  house_number: string
   city: string
   state: string
   zip_code: string
@@ -70,7 +71,8 @@ export interface PodRental {
   full_name: string
   email: string
   phone: string
-  installation_address: string
+  street_name: string
+  house_number: string
   city: string
   state: string
   zip_code: string

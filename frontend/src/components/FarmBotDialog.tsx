@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Bot, Leaf, Loader2, Send, X } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { chatWithFarmBot } from '@/services/api'
@@ -142,7 +144,32 @@ export default function FarmBotDialog({ open, onOpenChange }: FarmBotDialogProps
                           : 'rounded-tl-sm bg-muted text-foreground'
                       }`}
                     >
-                      {msg.content}
+                      {msg.role === 'assistant' ? (
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={{
+                            p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                            ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
+                            ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
+                            strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                            em: ({ children }) => <em className="italic">{children}</em>,
+                            code: ({ children }) => (
+                              <code className="bg-black/20 px-1.5 py-0.5 rounded text-xs font-mono">
+                                {children}
+                              </code>
+                            ),
+                            blockquote: ({ children }) => (
+                              <blockquote className="border-l-2 border-current pl-3 italic opacity-80 mb-2">
+                                {children}
+                              </blockquote>
+                            ),
+                          }}
+                        >
+                          {msg.content}
+                        </ReactMarkdown>
+                      ) : (
+                        msg.content
+                      )}
                     </div>
                   </div>
                 ))}

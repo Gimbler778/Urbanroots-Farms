@@ -1,7 +1,8 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr, field_validator
 from datetime import date, datetime
 from typing import Dict, Optional, List
 from enum import Enum
+import re
 
 
 class OrderStatus(str, Enum):
@@ -18,6 +19,7 @@ class PodRentalStatus(str, Enum):
     RENTING = "renting"
     COMPLETED = "completed"
     CANCELLED = "cancelled"
+    REFUND_PENDING = "refund_pending"
 
 
 class BuildingApplicationStatus(str, Enum):
@@ -131,7 +133,8 @@ class PodRentalCreate(BaseModel):
     full_name: str
     email: str
     phone: str
-    installation_address: str
+    street_name: str
+    house_number: str
     city: str
     state: str
     zip_code: str
@@ -142,6 +145,20 @@ class PodRentalCreate(BaseModel):
     growing_goals: Optional[str] = None
     notes: Optional[str] = None
     terms_accepted: bool
+
+    @field_validator('phone')
+    def validate_phone(cls, v):
+        # Accept common phone formats
+        if not re.match(r'^[\d\-\+\(\)\s]{10,}$', v):
+            raise ValueError('Phone must be at least 10 digits')
+        return v
+
+    @field_validator('zip_code')
+    def validate_zip(cls, v):
+        # Simple zip code validation
+        if not re.match(r'^\d{5,6}$', v):
+            raise ValueError('Zip code must be 5-6 digits')
+        return v
 
 
 class PodRental(BaseModel):
@@ -156,7 +173,8 @@ class PodRental(BaseModel):
     full_name: str
     email: str
     phone: str
-    installation_address: str
+    street_name: str
+    house_number: str
     city: str
     state: str
     zip_code: str

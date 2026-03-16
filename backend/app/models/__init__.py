@@ -76,6 +76,7 @@ class PodRentalStatus(str, enum.Enum):
     RENTING = "renting"
     COMPLETED = "completed"
     CANCELLED = "cancelled"
+    REFUND_PENDING = "refund_pending"
 
 
 class PodRental(Base):
@@ -92,7 +93,10 @@ class PodRental(Base):
     full_name = Column(String, nullable=False)
     email = Column(String, nullable=False)
     phone = Column(String, nullable=False)
-    installation_address = Column(Text, nullable=False)
+    # Legacy column kept for backward compatibility with existing production schema.
+    installation_address = Column(Text, nullable=True)
+    street_name = Column(String, nullable=False)
+    house_number = Column(String, nullable=False)
     city = Column(String, nullable=False)
     state = Column(String, nullable=False)
     zip_code = Column(String, nullable=False)
