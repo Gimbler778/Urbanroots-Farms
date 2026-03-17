@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useMemo, useState } from 'react'
+import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowBigDown, ArrowBigUp, ArrowLeft, CalendarDays, Leaf, MessageCircleReply, Ruler, Sprout, Star, Trash2 } from 'lucide-react'
@@ -52,7 +52,7 @@ export default function PodDetailPage() {
     return grouped
   }, [reviews])
 
-  const loadReviews = async (podPlanId: string, page: number, sort: 'newest' | 'oldest') => {
+  const loadReviews = useCallback(async (podPlanId: string, page: number, sort: 'newest' | 'oldest') => {
     setReviewsLoading(true)
     setReviewsError(null)
     try {
@@ -65,14 +65,14 @@ export default function PodDetailPage() {
     } finally {
       setReviewsLoading(false)
     }
-  }
+  }, [reviewPageSize])
 
   useEffect(() => {
     if (!pod?.id) {
       return
     }
     loadReviews(pod.id, reviewPage, reviewSort)
-  }, [pod?.id, reviewPage, reviewSort, reviewPageSize])
+  }, [pod?.id, reviewPage, reviewSort, loadReviews])
 
   const handleCreateReview = async (event: FormEvent) => {
     event.preventDefault()

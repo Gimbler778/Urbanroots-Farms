@@ -1,8 +1,10 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from typing import List
 import httpx
 from app.core.config import settings
+from app.api.dependencies import get_current_user
+from app.models import User
 
 router = APIRouter()
 
@@ -41,11 +43,17 @@ class ChatResponse(BaseModel):
 
 
 @router.post("/farmbot/chat", response_model=ChatResponse)
-async def farmbot_chat(request: ChatRequest):
+async def farmbot_chat(request: ChatRequest, current_user: User = Depends(get_current_user)):
     if not settings.cloudflare_account_id or settings.cloudflare_account_id == "your_account_id_here":
         raise HTTPException(
             status_code=503,
             detail="FarmBot is not configured. Please set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN."
+        )
+
+    if not settings.cloudflare_api_token or settings.cloudflare_api_token == "your_api_token_here":
+        raise HTTPException(
+            status_code=503,
+            detail="FarmBot is not configured. Please set CLOUDFLARE_API_TOKEN."
         )
 
     # Limit to last 20 messages to avoid token overflow

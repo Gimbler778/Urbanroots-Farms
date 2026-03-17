@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Layout from '@/components/Layout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -38,14 +38,14 @@ export default function ProductsPage() {
     });
   };
 
-  const scrollToFirstCard = (tab: 'equipment' | 'services') => {
+  const scrollToFirstCard = useCallback((tab: 'equipment' | 'services') => {
     const el = tab === 'equipment' ? equipmentGridRef.current : servicesGridRef.current;
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else {
       scrollToTop();
     }
-  };
+  }, []);
 
   const handlePageChange = (
     page: number,
@@ -58,7 +58,7 @@ export default function ProductsPage() {
 
   useEffect(() => {
     requestAnimationFrame(() => scrollToFirstCard(activeTab));
-  }, [equipmentPage, servicesPage, activeTab]);
+  }, [equipmentPage, servicesPage, activeTab, scrollToFirstCard]);
 
   const renderPagination = (
     currentPage: number,
