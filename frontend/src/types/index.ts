@@ -93,6 +93,46 @@ export interface PodRentalResponse {
   message: string
 }
 
+export interface PodReview {
+  id: string
+  pod_plan_id: 'starter' | 'standard' | 'premium'
+  parent_id: string | null
+  user_id: string
+  author_name: string
+  body: string
+  rating: number | null
+  depth: number
+  path: string
+  upvotes: number
+  score: number
+  is_deleted: boolean
+  user_vote: -1 | 0 | 1
+  created_at: string
+  updated_at: string
+}
+
+export interface PodReviewListResponse {
+  reviews: PodReview[]
+  page: number
+  page_size: number
+  total_top_level: number
+  has_next: boolean
+  sort: 'newest' | 'oldest'
+}
+
+export interface PodReviewCreatePayload {
+  body: string
+  rating: number
+}
+
+export interface PodReviewReplyPayload {
+  body: string
+}
+
+export interface PodReviewVotePayload {
+  value: -1 | 0 | 1
+}
+
 export interface OrderHistoryItem {
   id: string
   type: 'product' | 'pod_rental'
