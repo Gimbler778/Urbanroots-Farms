@@ -10,6 +10,11 @@ import type {
   OrderHistoryItem,
   PodRentalRequest,
   PodRentalResponse,
+  PodReview,
+  PodReviewCreatePayload,
+  PodReviewListResponse,
+  PodReviewReplyPayload,
+  PodReviewVotePayload,
   AdminDashboardData,
   BuildingApplicationStatus,
   PodRentalStatus,
@@ -81,6 +86,37 @@ export const getMyOrders = async () => {
 
 export const cancelPodRental = async (id: string) => {
   const response = await api.post<PodRentalResponse>(`/pod-rentals/${id}/cancel`)
+  return response.data
+}
+
+export const getPodReviews = async (podPlanId: string, page = 1, pageSize = 10, sort: 'newest' | 'oldest' = 'newest') => {
+  const response = await api.get<PodReviewListResponse>(`/pods/${podPlanId}/reviews`, {
+    params: {
+      page,
+      page_size: pageSize,
+      sort,
+    },
+  })
+  return response.data
+}
+
+export const createPodReview = async (podPlanId: string, payload: PodReviewCreatePayload) => {
+  const response = await api.post<PodReview>(`/pods/${podPlanId}/reviews`, payload)
+  return response.data
+}
+
+export const replyToPodReview = async (podPlanId: string, reviewId: string, payload: PodReviewReplyPayload) => {
+  const response = await api.post<PodReview>(`/pods/${podPlanId}/reviews/${reviewId}/replies`, payload)
+  return response.data
+}
+
+export const votePodReview = async (podPlanId: string, reviewId: string, payload: PodReviewVotePayload) => {
+  const response = await api.post<PodReview>(`/pods/${podPlanId}/reviews/${reviewId}/vote`, payload)
+  return response.data
+}
+
+export const deletePodReview = async (podPlanId: string, reviewId: string) => {
+  const response = await api.delete<{ success: boolean; message: string }>(`/pods/${podPlanId}/reviews/${reviewId}`)
   return response.data
 }
 

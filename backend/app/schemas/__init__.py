@@ -202,6 +202,49 @@ class PodRentalStatusUpdate(BaseModel):
     status: PodRentalStatus
 
 
+class PodReviewCreate(BaseModel):
+    body: str = Field(min_length=1, max_length=2000)
+    rating: int = Field(ge=1, le=5)
+
+
+class PodReviewReplyCreate(BaseModel):
+    body: str = Field(min_length=1, max_length=2000)
+
+
+class PodReview(BaseModel):
+    id: str
+    pod_plan_id: str
+    parent_id: Optional[str] = None
+    user_id: str
+    author_name: str
+    body: str
+    rating: Optional[int] = None
+    depth: int
+    path: str
+    upvotes: int
+    score: int
+    is_deleted: bool
+    user_vote: int = 0
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class PodReviewListResponse(BaseModel):
+    reviews: List[PodReview]
+    page: int
+    page_size: int
+    total_top_level: int
+    has_next: bool
+    sort: str
+
+
+class PodReviewVoteUpdate(BaseModel):
+    value: int = Field(ge=-1, le=1)
+
+
 class OrderHistoryItem(BaseModel):
     id: str
     type: str

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Float, Integer, Boolean, DateTime, ForeignKey, Text, Enum
+from sqlalchemy import Column, String, Float, Integer, Boolean, DateTime, ForeignKey, Text, Enum, SmallInteger, CheckConstraint, UniqueConstraint
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import uuid
@@ -107,6 +107,48 @@ class PodRental(Base):
     growing_goals = Column(Text, nullable=True)
     notes = Column(Text, nullable=True)
     terms_accepted = Column(Boolean, nullable=False, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class PodReview(Base):
+    __tablename__ = "pod_reviews"
+    __table_args__ = (
+        CheckConstraint("rating IS NULL OR (rating >= 1 AND rating <= 5)", name="ck_pod_reviews_rating_range"),
+    )
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    pod_plan_id = Column(String, nullable=False, index=True)
+    parent_id = Column(String, ForeignKey("pod_reviews.id", ondelete="CASCADE"), nullable=True, index=True)
+    user_id = Column(String, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
+    author_name = Column(String, nullable=False)
+    body = Column(Text, nullable=False)
+    rating = Column(SmallInteger, nullable=True)
+    depth = Column(SmallInteger, nullable=False, default=0)
+    path = Column(Text, nullable=False, index=True)
+    upvotes = Column(Integer, nullable=False, default=0)
+    is_deleted = Column(Boolean, nullable=False, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    parent = relationship("PodReview", remote_side=[id], backref="replies")
+
+    @property
+    def score(self) -> int:
+        return self.upvotes
+
+
+class PodReviewVote(Base):
+    __tablename__ = "pod_review_votes"
+    __table_args__ = (
+        UniqueConstraint("review_id", "user_id", name="uq_pod_review_votes_review_user"),
+        CheckConstraint("value IN (-1, 1)", name="ck_pod_review_votes_value"),
+    )
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    review_id = Column(String, ForeignKey("pod_reviews.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(String, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
+    value = Column(SmallInteger, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
