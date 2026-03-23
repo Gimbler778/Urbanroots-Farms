@@ -61,6 +61,12 @@ def ensure_runtime_schema() -> None:
             if engine.dialect.name == "postgresql":
                 connection.execute(text("ALTER TYPE podrentalstatus ADD VALUE IF NOT EXISTS 'refund_pending'"))
 
+    if "product_reviews" in table_names:
+        product_review_columns = {column["name"] for column in inspector.get_columns("product_reviews")}
+        if "upvotes" not in product_review_columns:
+            with engine.begin() as connection:
+                connection.execute(text("ALTER TABLE product_reviews ADD COLUMN upvotes INTEGER DEFAULT 0 NOT NULL"))
+
 def get_db():
     db = SessionLocal()
     try:

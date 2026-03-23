@@ -15,6 +15,12 @@ import type {
   PodReviewListResponse,
   PodReviewReplyPayload,
   PodReviewVotePayload,
+  ProductReview,
+  ProductReviewCreatePayload,
+  ProductReviewListResponse,
+  ProductReviewReplyPayload,
+  ProductReviewVotePayload,
+  PersistedCartItem,
   AdminDashboardData,
   BuildingApplicationStatus,
   PodRentalStatus,
@@ -117,6 +123,62 @@ export const votePodReview = async (podPlanId: string, reviewId: string, payload
 
 export const deletePodReview = async (podPlanId: string, reviewId: string) => {
   const response = await api.delete<{ success: boolean; message: string }>(`/pods/${podPlanId}/reviews/${reviewId}`)
+  return response.data
+}
+
+export const getProductReviews = async (productId: string, page = 1, pageSize = 10, sort: 'newest' | 'oldest' | 'top' = 'newest') => {
+  const response = await api.get<ProductReviewListResponse>(`/products/${productId}/reviews`, {
+    params: {
+      page,
+      page_size: pageSize,
+      sort,
+    },
+  })
+  return response.data
+}
+
+export const createProductReview = async (productId: string, payload: ProductReviewCreatePayload) => {
+  const response = await api.post<ProductReview>(`/products/${productId}/reviews`, payload)
+  return response.data
+}
+
+export const replyToProductReview = async (productId: string, reviewId: string, payload: ProductReviewReplyPayload) => {
+  const response = await api.post<ProductReview>(`/products/${productId}/reviews/${reviewId}/replies`, payload)
+  return response.data
+}
+
+export const deleteProductReview = async (productId: string, reviewId: string) => {
+  const response = await api.delete<{ success: boolean; message: string }>(`/products/${productId}/reviews/${reviewId}`)
+  return response.data
+}
+
+export const voteProductReview = async (productId: string, reviewId: string, payload: ProductReviewVotePayload) => {
+  const response = await api.post<ProductReview>(`/products/${productId}/reviews/${reviewId}/vote`, payload)
+  return response.data
+}
+
+export const getUserCart = async () => {
+  const response = await api.get<PersistedCartItem[]>('/cart')
+  return response.data
+}
+
+export const upsertUserCartItem = async (item: PersistedCartItem) => {
+  const response = await api.put<PersistedCartItem>(`/cart/items/${item.product_id}`, item)
+  return response.data
+}
+
+export const updateUserCartItemQuantity = async (productId: string, quantity: number) => {
+  const response = await api.patch<PersistedCartItem>(`/cart/items/${productId}`, { quantity })
+  return response.data
+}
+
+export const removeUserCartItem = async (productId: string) => {
+  const response = await api.delete<{ success: boolean }>(`/cart/items/${productId}`)
+  return response.data
+}
+
+export const clearUserCart = async () => {
+  const response = await api.delete<{ success: boolean }>('/cart')
   return response.data
 }
 
