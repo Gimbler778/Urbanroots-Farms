@@ -7,6 +7,7 @@ from sqlalchemy import asc, desc, func, or_
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import get_current_user
+from app.core.config import settings
 from app.core.database import get_db
 from app.models import PodReview as PodReviewModel, PodReviewVote, Session as AuthSession, User
 from app.schemas import PodReview, PodReviewCreate, PodReviewListResponse, PodReviewReplyCreate, PodReviewVoteUpdate
@@ -14,7 +15,7 @@ from app.services.pod_rental_service import PodRentalService
 
 router = APIRouter(prefix="/pods", tags=["pod-reviews"])
 
-MAX_THREAD_DEPTH = 8
+MAX_THREAD_DEPTH = max(1, settings.pod_review_max_thread_depth)
 
 
 def _ensure_valid_pod_plan(pod_plan_id: str) -> None:
@@ -88,7 +89,7 @@ def list_pod_reviews(
     request: Request,
     page: int = 1,
     page_size: int = 10,
-    sort: Literal["newest", "oldest"] = "newest",
+    sort: Literal["newest", "oldest", "top"] = "newest",
     db: Session = Depends(get_db),
 ):
     _ensure_valid_pod_plan(pod_plan_id)
@@ -102,16 +103,25 @@ def list_pod_reviews(
         .scalar()
     ) or 0
 
-    order_clause = desc(PodReviewModel.created_at) if sort == "newest" else asc(PodReviewModel.created_at)
+    if sort == "top":
+        order_clause = (desc(PodReviewModel.upvotes), desc(PodReviewModel.created_at))
+    elif sort == "oldest":
+        order_clause = asc(PodReviewModel.created_at)
+    else:
+        order_clause = desc(PodReviewModel.created_at)
 
-    roots = (
+    roots_query = (
         db.query(PodReviewModel)
         .filter(PodReviewModel.pod_plan_id == pod_plan_id, PodReviewModel.parent_id.is_(None))
-        .order_by(order_clause)
-        .offset((page - 1) * page_size)
-        .limit(page_size)
-        .all()
     )
+
+    if isinstance(order_clause, tuple):
+        for clause in order_clause:
+            roots_query = roots_query.order_by(clause)
+    else:
+        roots_query = roots_query.order_by(order_clause)
+
+    roots = roots_query.offset((page - 1) * page_size).limit(page_size).all()
 
     if not roots:
         return {

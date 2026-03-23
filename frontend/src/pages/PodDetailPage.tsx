@@ -27,7 +27,7 @@ export default function PodDetailPage() {
   const [reviewsError, setReviewsError] = useState<string | null>(null)
   const [reviewPage, setReviewPage] = useState(1)
   const [reviewPageSize] = useState(6)
-  const [reviewSort, setReviewSort] = useState<'newest' | 'oldest'>('newest')
+  const [reviewSort, setReviewSort] = useState<'newest' | 'oldest' | 'top'>('newest')
   const [topLevelCount, setTopLevelCount] = useState(0)
   const [hasNextPage, setHasNextPage] = useState(false)
   const [newReviewBody, setNewReviewBody] = useState('')
@@ -36,6 +36,7 @@ export default function PodDetailPage() {
   const [openReplyId, setOpenReplyId] = useState<string | null>(null)
   const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({})
   const [submittingReplyId, setSubmittingReplyId] = useState<string | null>(null)
+  const [collapsedThreadById, setCollapsedThreadById] = useState<Record<string, boolean>>({})
   const [votePendingId, setVotePendingId] = useState<string | null>(null)
   const [deletePendingId, setDeletePendingId] = useState<string | null>(null)
 
@@ -52,7 +53,33 @@ export default function PodDetailPage() {
     return grouped
   }, [reviews])
 
-  const loadReviews = useCallback(async (podPlanId: string, page: number, sort: 'newest' | 'oldest') => {
+  const descendantCountById = useMemo(() => {
+    const countCache = new Map<string, number>()
+
+    const countDescendants = (reviewId: string): number => {
+      const cached = countCache.get(reviewId)
+      if (cached !== undefined) {
+        return cached
+      }
+
+      const children = reviewsByParent.get(reviewId) ?? []
+      let total = children.length
+      children.forEach((child) => {
+        total += countDescendants(child.id)
+      })
+
+      countCache.set(reviewId, total)
+      return total
+    }
+
+    reviews.forEach((review) => {
+      countDescendants(review.id)
+    })
+
+    return countCache
+  }, [reviews, reviewsByParent])
+
+  const loadReviews = useCallback(async (podPlanId: string, page: number, sort: 'newest' | 'oldest' | 'top') => {
     setReviewsLoading(true)
     setReviewsError(null)
     try {
@@ -116,6 +143,7 @@ export default function PodDetailPage() {
     try {
       await replyToPodReview(pod.id, reviewId, { body })
       setReplyDrafts((prev) => ({ ...prev, [reviewId]: '' }))
+      setCollapsedThreadById((prev) => ({ ...prev, [reviewId]: false }))
       setOpenReplyId(null)
       await loadReviews(pod.id, reviewPage, reviewSort)
     } catch {
@@ -135,11 +163,22 @@ export default function PodDetailPage() {
     }
 
     const nextValue: -1 | 0 | 1 = review.user_vote === direction ? 0 : direction
+    const delta = nextValue - review.user_vote
+    const previous = reviews.map((item) => ({ ...item }))
+
     setVotePendingId(review.id)
+    setReviews((current) =>
+      current.map((item) =>
+        item.id === review.id
+          ? { ...item, user_vote: nextValue, score: item.score + delta, upvotes: item.upvotes + delta }
+          : item,
+      ),
+    )
+
     try {
       await votePodReview(pod.id, review.id, { value: nextValue })
-      await loadReviews(pod.id, reviewPage, reviewSort)
     } catch {
+      setReviews(previous)
       setReviewsError('Could not update your vote. Please try again.')
     } finally {
       setVotePendingId(null)
@@ -164,10 +203,40 @@ export default function PodDetailPage() {
 
   const renderReviewTree = (review: PodReview) => {
     const replies = reviewsByParent.get(review.id) ?? []
+    const hasReplies = replies.length > 0
+    const isCollapsed = collapsedThreadById[review.id] ?? false
+    const descendantCount = descendantCountById.get(review.id) ?? replies.length
+    const showRail = hasReplies || review.depth > 0
 
     return (
-      <div key={review.id} className="mt-4" style={{ marginLeft: `${Math.min(review.depth, 5) * 18}px` }}>
-        <div className="rounded-2xl border border-primary/10 bg-card/90 p-4">
+      <div
+        key={review.id}
+        className={showRail ? 'relative mt-4 border-l border-dashed border-border pl-6' : 'mt-4'}
+      >
+        {showRail ? (
+          <span aria-hidden="true" className="absolute left-0 top-4 w-4 border-t border-dashed border-border" />
+        ) : null}
+
+        {hasReplies ? (
+          <button
+            type="button"
+            onClick={() => setCollapsedThreadById((prev) => ({ ...prev, [review.id]: !isCollapsed }))}
+            className="group absolute left-[-10px] top-2 inline-flex h-5 w-5 items-center justify-center rounded-sm border border-border bg-background text-[10px] font-semibold text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label={isCollapsed ? 'Expand replies' : 'Collapse replies'}
+            title={isCollapsed ? 'Expand this thread' : 'Collapse this thread'}
+          >
+            {isCollapsed ? '+' : '-'}
+          </button>
+        ) : showRail ? (
+          <span
+            aria-hidden="true"
+            className="absolute left-[-10px] top-2 inline-flex h-5 w-5 items-center justify-center rounded-sm border border-border bg-muted text-[10px] font-semibold text-muted-foreground"
+          >
+            ·
+          </span>
+        ) : null}
+
+        <div className="relative w-full rounded-2xl border border-primary/10 bg-card/90 p-4">
           <div className="flex flex-wrap items-center gap-2">
             <p className="text-sm font-semibold">{review.author_name}</p>
             <span className="text-xs text-muted-foreground">{new Date(review.created_at).toLocaleString()}</span>
@@ -251,7 +320,17 @@ export default function PodDetailPage() {
           ) : null}
         </div>
 
-        {replies.map((reply) => renderReviewTree(reply))}
+        {hasReplies && isCollapsed ? (
+          <button
+            type="button"
+            onClick={() => setCollapsedThreadById((prev) => ({ ...prev, [review.id]: false }))}
+            className="mt-2 text-xs font-medium text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+          >
+            + {descendantCount} {descendantCount === 1 ? 'reply' : 'replies'} hidden
+          </button>
+        ) : null}
+
+        {!isCollapsed ? replies.map((reply) => renderReviewTree(reply)) : null}
       </div>
     )
   }
@@ -283,7 +362,17 @@ export default function PodDetailPage() {
             <ScrollReveal yOffset={24}>
               <div className="space-y-4">
                 <div className="overflow-hidden rounded-[28px] border border-primary/15 bg-white shadow-[0_20px_55px_rgba(52,77,48,0.12)]">
-                  <img src={pod.images[selectedImage]} alt={pod.name} className="h-[460px] w-full object-cover" />
+                  {(() => {
+                    const src = pod.images[selectedImage]
+                    const isTopView = typeof src === 'string' && src.toLowerCase().includes('top')
+                    return (
+                      <img
+                        src={src}
+                        alt={pod.name}
+                        className={`h-[460px] w-full ${isTopView ? 'object-contain bg-muted/30' : 'object-cover'}`}
+                      />
+                    )
+                  })()}
                 </div>
                 <div className="grid grid-cols-4 gap-3 sm:grid-cols-5">
                   {pod.images.map((image, index) => (
@@ -468,13 +557,14 @@ export default function PodDetailPage() {
                       id="review-sort"
                       value={reviewSort}
                       onChange={(event) => {
-                        setReviewSort(event.target.value as 'newest' | 'oldest')
+                        setReviewSort(event.target.value as 'newest' | 'oldest' | 'top')
                         setReviewPage(1)
                       }}
                       className="rounded-lg border border-input bg-background px-2 py-1.5 text-sm"
                     >
                       <option value="newest">Newest</option>
                       <option value="oldest">Oldest</option>
+                      <option value="top">Most liked</option>
                     </select>
                   </div>
                 </div>
