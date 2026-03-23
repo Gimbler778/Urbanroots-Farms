@@ -39,6 +39,7 @@ class Settings(BaseSettings):
         "http://localhost:3001,"
         "http://127.0.0.1:3001"
     )
+    pod_review_max_thread_depth: int = 20
 
     # ---------------- CONFIG ---------------- #
     model_config = SettingsConfigDict(

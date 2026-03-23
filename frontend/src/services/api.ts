@@ -89,7 +89,7 @@ export const cancelPodRental = async (id: string) => {
   return response.data
 }
 
-export const getPodReviews = async (podPlanId: string, page = 1, pageSize = 10, sort: 'newest' | 'oldest' = 'newest') => {
+export const getPodReviews = async (podPlanId: string, page = 1, pageSize = 10, sort: 'newest' | 'oldest' | 'top' = 'newest') => {
   const response = await api.get<PodReviewListResponse>(`/pods/${podPlanId}/reviews`, {
     params: {
       page,
