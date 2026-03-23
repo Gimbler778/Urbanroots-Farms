@@ -245,6 +245,80 @@ class PodReviewVoteUpdate(BaseModel):
     value: int = Field(ge=-1, le=1)
 
 
+class ProductReviewCreate(BaseModel):
+    body: str = Field(min_length=1, max_length=2000)
+    rating: int = Field(ge=1, le=5)
+
+
+class ProductReviewReplyCreate(BaseModel):
+    body: str = Field(min_length=1, max_length=2000)
+
+
+class ProductReview(BaseModel):
+    id: str
+    product_id: str
+    parent_id: Optional[str] = None
+    user_id: str
+    author_name: str
+    body: str
+    rating: Optional[int] = None
+    depth: int
+    path: str
+    upvotes: int
+    score: int
+    is_deleted: bool
+    user_vote: int = 0
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class ProductReviewListResponse(BaseModel):
+    reviews: List[ProductReview]
+    page: int
+    page_size: int
+    total_top_level: int
+    has_next: bool
+    sort: str
+
+
+class ProductReviewVoteUpdate(BaseModel):
+    value: int = Field(ge=-1, le=1)
+
+
+class UserCartItemPayload(BaseModel):
+    product_id: str
+    name: str
+    category: str
+    price: float = Field(gt=0)
+    description: str
+    image: str
+    quantity: int = Field(ge=1)
+
+
+class UserCartItemUpdate(BaseModel):
+    quantity: int = Field(ge=1)
+
+
+class UserCartItem(BaseModel):
+    id: str
+    user_id: str
+    product_id: str
+    name: str
+    category: str
+    price: float
+    description: str
+    image: str
+    quantity: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
 class OrderHistoryItem(BaseModel):
     id: str
     type: str

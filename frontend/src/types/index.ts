@@ -117,7 +117,7 @@ export interface PodReviewListResponse {
   page_size: number
   total_top_level: number
   has_next: boolean
-  sort: 'newest' | 'oldest'
+  sort: 'newest' | 'oldest' | 'top'
 }
 
 export interface PodReviewCreatePayload {
@@ -131,6 +131,56 @@ export interface PodReviewReplyPayload {
 
 export interface PodReviewVotePayload {
   value: -1 | 0 | 1
+}
+
+export interface ProductReview {
+  id: string
+  product_id: string
+  parent_id: string | null
+  user_id: string
+  author_name: string
+  body: string
+  rating: number | null
+  depth: number
+  path: string
+  upvotes: number
+  score: number
+  is_deleted: boolean
+  user_vote: -1 | 0 | 1
+  created_at: string
+  updated_at: string
+}
+
+export interface ProductReviewListResponse {
+  reviews: ProductReview[]
+  page: number
+  page_size: number
+  total_top_level: number
+  has_next: boolean
+  sort: 'newest' | 'oldest' | 'top'
+}
+
+export interface ProductReviewCreatePayload {
+  body: string
+  rating: number
+}
+
+export interface ProductReviewReplyPayload {
+  body: string
+}
+
+export interface ProductReviewVotePayload {
+  value: -1 | 0 | 1
+}
+
+export interface PersistedCartItem {
+  product_id: string
+  name: string
+  category: string
+  price: number
+  description: string
+  image: string
+  quantity: number
 }
 
 export interface OrderHistoryItem {

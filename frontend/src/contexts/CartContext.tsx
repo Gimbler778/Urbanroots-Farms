@@ -1,5 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Product, CartItem } from '@/types/product';
+import { useAuth } from '@/hooks/useAuth';
+import { clearUserCart, getUserCart, removeUserCartItem, updateUserCartItemQuantity, upsertUserCartItem } from '@/services/api';
 
 interface CartContextType {
   cart: CartItem[];
@@ -14,30 +16,99 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, loading } = useAuth();
   const [cart, setCart] = useState<CartItem[]>(() => {
-    // Load cart from localStorage on initialization
     const savedCart = localStorage.getItem('urbanroots-cart');
     return savedCart ? JSON.parse(savedCart) : [];
   });
 
-  // Save cart to localStorage whenever it changes
+  const toPersisted = (item: CartItem) => ({
+    product_id: item.id,
+    name: item.name,
+    category: item.category,
+    price: item.price,
+    description: item.description,
+    image: item.images[0] ?? '',
+    quantity: item.quantity,
+  });
+
+  const toCartItem = (item: {
+    product_id: string;
+    name: string;
+    category: string;
+    price: number;
+    description: string;
+    image: string;
+    quantity: number;
+  }): CartItem => ({
+    id: item.product_id,
+    name: item.name,
+    category: item.category as Product['category'],
+    price: item.price,
+    description: item.description,
+    longDescription: item.description,
+    images: [item.image],
+    features: [],
+    quantity: item.quantity,
+  });
+
   useEffect(() => {
-    localStorage.setItem('urbanroots-cart', JSON.stringify(cart));
-  }, [cart]);
+    if (loading) {
+      return;
+    }
+
+    if (!user) {
+      const savedCart = localStorage.getItem('urbanroots-cart');
+      setCart(savedCart ? JSON.parse(savedCart) : []);
+      return;
+    }
+
+    const loadServerCart = async () => {
+      try {
+        const items = await getUserCart();
+        setCart(items.map(toCartItem));
+      } catch {
+        // Keep current cart state if server fetch fails.
+      }
+    };
+
+    void loadServerCart();
+  }, [user, loading]);
+
+  useEffect(() => {
+    if (!user) {
+      localStorage.setItem('urbanroots-cart', JSON.stringify(cart));
+    }
+  }, [cart, user]);
 
   const addToCart = (product: Product) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((item) => item.id === product.id);
+      let nextCart: CartItem[];
+      let changedItem: CartItem;
+
       if (existingItem) {
-        return prevCart.map((item) =>
+        nextCart = prevCart.map((item) =>
           item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
         );
+        changedItem = nextCart.find((item) => item.id === product.id) as CartItem;
+      } else {
+        changedItem = { ...product, quantity: 1 };
+        nextCart = [...prevCart, changedItem];
       }
-      return [...prevCart, { ...product, quantity: 1 }];
+
+      if (user) {
+        void upsertUserCartItem(toPersisted(changedItem));
+      }
+
+      return nextCart;
     });
   };
 
   const removeFromCart = (productId: string) => {
+    if (user) {
+      void removeUserCartItem(productId);
+    }
     setCart((prevCart) => prevCart.filter((item) => item.id !== productId));
   };
 
@@ -46,14 +117,23 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       removeFromCart(productId);
       return;
     }
-    setCart((prevCart) =>
-      prevCart.map((item) =>
+    setCart((prevCart) => {
+      const nextCart = prevCart.map((item) =>
         item.id === productId ? { ...item, quantity } : item
-      )
-    );
+      );
+
+      if (user) {
+        void updateUserCartItemQuantity(productId, quantity);
+      }
+
+      return nextCart;
+    });
   };
 
   const clearCart = () => {
+    if (user) {
+      void clearUserCart();
+    }
     setCart([]);
   };
 

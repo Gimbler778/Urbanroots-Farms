@@ -153,6 +153,68 @@ class PodReviewVote(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
+class ProductReview(Base):
+    __tablename__ = "product_reviews"
+    __table_args__ = (
+        CheckConstraint("rating IS NULL OR (rating >= 1 AND rating <= 5)", name="ck_product_reviews_rating_range"),
+    )
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    product_id = Column(String, nullable=False, index=True)
+    parent_id = Column(String, ForeignKey("product_reviews.id", ondelete="CASCADE"), nullable=True, index=True)
+    user_id = Column(String, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
+    author_name = Column(String, nullable=False)
+    body = Column(Text, nullable=False)
+    rating = Column(SmallInteger, nullable=True)
+    depth = Column(SmallInteger, nullable=False, default=0)
+    path = Column(Text, nullable=False, index=True)
+    upvotes = Column(Integer, nullable=False, default=0)
+    is_deleted = Column(Boolean, nullable=False, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    parent = relationship("ProductReview", remote_side=[id], backref="replies")
+
+    @property
+    def score(self) -> int:
+        return self.upvotes
+
+
+class ProductReviewVote(Base):
+    __tablename__ = "product_review_votes"
+    __table_args__ = (
+        UniqueConstraint("review_id", "user_id", name="uq_product_review_votes_review_user"),
+        CheckConstraint("value IN (-1, 1)", name="ck_product_review_votes_value"),
+    )
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    review_id = Column(String, ForeignKey("product_reviews.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(String, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
+    value = Column(SmallInteger, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class UserCartItem(Base):
+    __tablename__ = "user_cart_items"
+    __table_args__ = (
+        UniqueConstraint("user_id", "product_id", name="uq_user_cart_items_user_product"),
+        CheckConstraint("quantity >= 1", name="ck_user_cart_items_quantity_positive"),
+    )
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(String, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
+    product_id = Column(String, nullable=False, index=True)
+    name = Column(String, nullable=False)
+    category = Column(String, nullable=False)
+    price = Column(Float, nullable=False)
+    description = Column(Text, nullable=False)
+    image = Column(String, nullable=False)
+    quantity = Column(Integer, nullable=False, default=1)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
 class BuildingApplicationStatus(str, enum.Enum):
     SUBMITTED = "submitted"
     REVIEWING = "reviewing"
