@@ -49,7 +49,7 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-primary/10 backdrop-blur-md shadow-sm shadow-primary/4">
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-primary/15 bg-white/70 backdrop-blur-md shadow-sm shadow-primary/10">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -73,10 +73,10 @@ export default function Navbar() {
                 to={item.path}
                 onClick={scrollToTop}
                 className={cn(
-                  "relative px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+                  "relative px-4 py-2 rounded-lg text-sm font-semibold transition-colors",
                   isActive(item.path)
                     ? "text-primary"
-                    : "text-foreground/70 hover:text-[hsl(var(--earth-brown))]"
+                    : "text-foreground/90 hover:text-[hsl(var(--earth-brown))]"
                 )}
               >
                 {isActive(item.path) && (
@@ -95,10 +95,10 @@ export default function Navbar() {
               to="/cart"
               onClick={scrollToTop}
               className={cn(
-                "relative px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2",
+                "relative px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2",
                 isActive('/cart')
                   ? "text-primary bg-primary/10"
-                  : "text-foreground/70 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10"
+                  : "text-foreground/90 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10"
               )}
             >
               <ShoppingCart className="w-5 h-5" />
@@ -178,8 +178,8 @@ export default function Navbar() {
                 <Link
                   to="/sign-in"
                   className={cn(
-                    "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
-                    "text-foreground/70 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10"
+                    "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all",
+                    "text-foreground/90 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10"
                   )}
                 >
                   <User className="w-4 h-4" />
@@ -218,10 +218,10 @@ export default function Navbar() {
                 to={item.path}
                 onClick={() => { setIsOpen(false); scrollToTop() }}
                 className={cn(
-                  "block px-4 py-3 rounded-lg text-sm font-medium transition-all",
+                  "block px-4 py-3 rounded-lg text-sm font-semibold transition-all",
                   isActive(item.path)
                     ? "text-primary bg-primary/10"
-                    : "text-foreground/70 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10"
+                    : "text-foreground/90 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10"
                 )}
               >
                 {item.name}
@@ -232,10 +232,10 @@ export default function Navbar() {
               to="/cart"
               onClick={() => { setIsOpen(false); scrollToTop() }}
               className={cn(
-                "flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-all relative",
+                "flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold transition-all relative",
                 isActive('/cart')
                   ? "text-primary bg-primary/10"
-                  : "text-foreground/70 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10"
+                  : "text-foreground/90 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10"
               )}
             >
               <ShoppingCart className="w-5 h-5" />
@@ -264,7 +264,7 @@ export default function Navbar() {
                   <Link
                     to="/my-orders"
                     onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-foreground/70 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10 transition-all"
+                    className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold text-foreground/90 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10 transition-all"
                   >
                     <ReceiptText className="w-4 h-4" />
                     My Orders
@@ -273,7 +273,7 @@ export default function Navbar() {
                     <Link
                       to="/admin"
                       onClick={() => setIsOpen(false)}
-                      className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-foreground/70 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10 transition-all"
+                      className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold text-foreground/90 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10 transition-all"
                     >
                       <Settings2 className="w-4 h-4" />
                       Admin Dashboard
@@ -282,7 +282,7 @@ export default function Navbar() {
                   <Link
                     to="/profile"
                     onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-foreground/70 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10 transition-all"
+                    className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold text-foreground/90 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10 transition-all"
                   >
                     <Pencil className="w-4 h-4" />
                     Edit Profile
@@ -300,8 +300,8 @@ export default function Navbar() {
                   to="/sign-in"
                   onClick={() => setIsOpen(false)}
                   className={cn(
-                    "flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-all",
-                    "text-foreground/70 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10"
+                    "flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold transition-all",
+                    "text-foreground/90 hover:text-[hsl(var(--earth-brown))] hover:bg-[hsl(var(--earth-brown))]/10"
                   )}
                 >
                   <User className="w-4 h-4" />

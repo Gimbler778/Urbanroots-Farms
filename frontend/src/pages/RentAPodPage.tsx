@@ -407,14 +407,14 @@ export default function RentAPodPage() {
                 <CardTitle className="text-2xl">Starter</CardTitle>
                 <CardDescription>Perfect for beginners</CardDescription>
                 <div className="pt-4">
-                  <div className="text-4xl font-bold">₹2,499<span className="text-lg font-normal text-muted-foreground">/mo</span></div>
+                  <div className="text-4xl font-bold">₹1,499<span className="text-lg font-normal text-muted-foreground">/mo</span></div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
                 <ul className="space-y-3">
                   <li className="flex items-center space-x-3">
                     <Check className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">Starter Pod (4x4 ft)</span>
+                    <span className="text-sm">Starter Pod (2x4 ft)</span>
                   </li>
                   <li className="flex items-center space-x-3">
                     <Check className="w-5 h-5 text-primary flex-shrink-0" />
@@ -450,14 +450,14 @@ export default function RentAPodPage() {
                 <CardTitle className="text-2xl">Standard</CardTitle>
                 <CardDescription>Most popular choice</CardDescription>
                 <div className="pt-4">
-                  <div className="text-4xl font-bold">₹4,999<span className="text-lg font-normal text-muted-foreground">/mo</span></div>
+                  <div className="text-4xl font-bold">₹2,999<span className="text-lg font-normal text-muted-foreground">/mo</span></div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
                 <ul className="space-y-3">
                   <li className="flex items-center space-x-3">
                     <Check className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">Standard Pod (8x4 ft)</span>
+                    <span className="text-sm">Standard Pod (4x4 ft)</span>
                   </li>
                   <li className="flex items-center space-x-3">
                     <Check className="w-5 h-5 text-primary flex-shrink-0" />
@@ -494,14 +494,14 @@ export default function RentAPodPage() {
                 <CardTitle className="text-2xl">Premium</CardTitle>
                 <CardDescription>Maximum production</CardDescription>
                 <div className="pt-4">
-                  <div className="text-4xl font-bold">₹8,999<span className="text-lg font-normal text-muted-foreground">/mo</span></div>
+                  <div className="text-4xl font-bold">₹4,999<span className="text-lg font-normal text-muted-foreground">/mo</span></div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
                 <ul className="space-y-3">
                   <li className="flex items-center space-x-3">
                     <Check className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">Premium Pod (12x8 ft)</span>
+                    <span className="text-sm">Premium Pod (6x4 ft)</span>
                   </li>
                   <li className="flex items-center space-x-3">
                     <Check className="w-5 h-5 text-primary flex-shrink-0" />

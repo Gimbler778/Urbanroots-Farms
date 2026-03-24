@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -15,9 +16,13 @@ import { equipmentData, servicesData } from '@/data/products';
 const ITEMS_PER_PAGE = 10;
 
 export default function ProductsPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedTab = searchParams.get('tab');
+  const initialTab: 'equipment' | 'services' = requestedTab === 'services' ? 'services' : 'equipment';
+
   const [equipmentPage, setEquipmentPage] = useState(1);
   const [servicesPage, setServicesPage] = useState(1);
-  const [activeTab, setActiveTab] = useState<'equipment' | 'services'>('equipment');
+  const [activeTab, setActiveTab] = useState<'equipment' | 'services'>(initialTab);
 
   const equipmentGridRef = useRef<HTMLDivElement | null>(null);
   const servicesGridRef = useRef<HTMLDivElement | null>(null);
@@ -59,6 +64,13 @@ export default function ProductsPage() {
   useEffect(() => {
     requestAnimationFrame(() => scrollToFirstCard(activeTab));
   }, [equipmentPage, servicesPage, activeTab, scrollToFirstCard]);
+
+  useEffect(() => {
+    const nextTab: 'equipment' | 'services' = requestedTab === 'services' ? 'services' : 'equipment';
+    if (nextTab !== activeTab) {
+      setActiveTab(nextTab);
+    }
+  }, [requestedTab, activeTab]);
 
   const renderPagination = (
     currentPage: number,
@@ -112,7 +124,11 @@ export default function ProductsPage() {
 
       <Tabs
         value={activeTab}
-        onValueChange={(v) => setActiveTab(v as 'equipment' | 'services')}
+        onValueChange={(v) => {
+          const nextTab = v as 'equipment' | 'services';
+          setActiveTab(nextTab);
+          setSearchParams({ tab: nextTab });
+        }}
         className="w-full"
       >
         <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">

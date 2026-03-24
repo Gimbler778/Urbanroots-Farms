@@ -21,6 +21,8 @@ import type {
   ProductReviewReplyPayload,
   ProductReviewVotePayload,
   PersistedCartItem,
+  ProductOrderBatchActionResponse,
+  ProductOrderBatch,
   AdminDashboardData,
   BuildingApplicationStatus,
   PodRentalStatus,
@@ -68,6 +70,21 @@ export const getOrders = async () => {
 
 export const getOrder = async (id: string) => {
   const response = await api.get<Order>(`/orders/${id}`)
+  return response.data
+}
+
+export const checkoutOrderBatch = async () => {
+  const response = await api.post<ProductOrderBatchActionResponse>('/orders/batches/checkout')
+  return response.data
+}
+
+export const cancelOrderBatch = async (batchId: string) => {
+  const response = await api.post<ProductOrderBatchActionResponse>(`/orders/batches/${batchId}/cancel`)
+  return response.data
+}
+
+export const cancelOrderBatchItem = async (batchId: string, itemId: string) => {
+  const response = await api.post<ProductOrderBatchActionResponse>(`/orders/batches/${batchId}/items/${itemId}/cancel`)
   return response.data
 }
 
@@ -191,6 +208,25 @@ export const clearUserCart = async () => {
 
 export const getAdminDashboard = async () => {
   const response = await api.get<AdminDashboardData>('/admin/dashboard')
+  return response.data
+}
+
+export const getAdminProductOrderBatches = async () => {
+  const response = await api.get<ProductOrderBatch[]>('/admin/product-order-batches')
+  return response.data
+}
+
+export const updateAdminProductOrderBatchStatus = async (batchId: string, status: ProductOrderBatch['status']) => {
+  const response = await api.patch<ProductOrderBatchActionResponse>(`/admin/product-order-batches/${batchId}`, { status })
+  return response.data
+}
+
+export const updateAdminProductOrderBatchItemStatus = async (
+  batchId: string,
+  itemId: string,
+  status: ProductOrderBatch['items'][number]['status'],
+) => {
+  const response = await api.patch<ProductOrderBatchActionResponse>(`/admin/product-order-batches/${batchId}/items/${itemId}`, { status })
   return response.data
 }
 

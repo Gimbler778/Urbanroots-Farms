@@ -67,6 +67,35 @@ def ensure_runtime_schema() -> None:
             with engine.begin() as connection:
                 connection.execute(text("ALTER TABLE product_reviews ADD COLUMN upvotes INTEGER DEFAULT 0 NOT NULL"))
 
+    if engine.dialect.name == "postgresql":
+        with engine.begin() as connection:
+            connection.execute(
+                text(
+                    """
+                    DO $$
+                    BEGIN
+                        IF EXISTS (SELECT 1 FROM pg_type WHERE typname = 'productorderbatchstatus') THEN
+                            ALTER TYPE productorderbatchstatus ADD VALUE IF NOT EXISTS 'PROCESSING';
+                            ALTER TYPE productorderbatchstatus ADD VALUE IF NOT EXISTS 'CONTACT_SCHEDULE';
+                        END IF;
+                    END $$;
+                    """
+                )
+            )
+            connection.execute(
+                text(
+                    """
+                    DO $$
+                    BEGIN
+                        IF EXISTS (SELECT 1 FROM pg_type WHERE typname = 'productorderbatchitemstatus') THEN
+                            ALTER TYPE productorderbatchitemstatus ADD VALUE IF NOT EXISTS 'PROCESSING';
+                            ALTER TYPE productorderbatchitemstatus ADD VALUE IF NOT EXISTS 'CONTACT_SCHEDULE';
+                        END IF;
+                    END $$;
+                    """
+                )
+            )
+
 def get_db():
     db = SessionLocal()
     try:

@@ -6,7 +6,15 @@ from app.core.config import settings
 from app.core.database import get_db
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
 from app.api.dependencies import get_current_user
-from app.models import Order, OrderItem, PodRental, PodRentalStatus, User
+from app.models import (
+  Order,
+  OrderItem,
+  PodRental,
+  PodRentalStatus,
+  ProductOrderBatch,
+  ProductOrderBatchItemStatus,
+  User,
+)
 from app.schemas import OrderHistoryItem, PodRentalCreate, PodRentalResponse
 from app.services.pod_rental_service import PodRentalService
 
@@ -258,6 +266,13 @@ def get_my_orders(
   user: User = Depends(get_current_user),
 ):
 
+  product_batches = (
+    db.query(ProductOrderBatch)
+    .options(joinedload(ProductOrderBatch.items))
+    .filter(ProductOrderBatch.user_id == user.id)
+    .all()
+  )
+
   product_orders = (
     db.query(Order)
     .options(joinedload(Order.items).joinedload(OrderItem.product))
@@ -267,6 +282,49 @@ def get_my_orders(
   pod_rentals = db.query(PodRental).filter(PodRental.user_id == user.id).all()
 
   history: list[dict] = []
+
+  for batch in product_batches:
+    batch_status = batch.status.value if hasattr(batch.status, "value") else str(batch.status)
+    active_items = [item for item in batch.items if item.status != ProductOrderBatchItemStatus.CANCELLED]
+    active_quantity = sum(item.quantity for item in active_items)
+    item_summary = ", ".join(f"{item.quantity} x {item.name}" for item in active_items[:3]) or "All items cancelled"
+    if len(active_items) > 3:
+      item_summary += f" +{len(active_items) - 3} more"
+
+    history.append({
+      "id": batch.id,
+      "batch_ref": batch.batch_ref,
+      "type": "product",
+      "title": f"Batch {batch.batch_ref}",
+      "subtitle": item_summary,
+      "status": batch_status,
+      "created_at": batch.created_at,
+      "total": batch.total,
+      "item_count": active_quantity,
+      "can_cancel": batch_status == "requested",
+      "product_items": [
+        {
+          "id": item.id,
+          "batch_id": item.batch_id,
+          "product_id": item.product_id,
+          "name": item.name,
+          "image": item.image,
+          "category": item.category,
+          "quantity": item.quantity,
+          "unit_price": item.unit_price,
+          "line_total": item.line_total,
+          "status": item.status,
+        }
+        for item in batch.items
+      ],
+      "details": {
+        "Batch reference": batch.batch_ref,
+        "Items": item_summary,
+        "Booked on": batch.created_at.strftime("%d %b %Y"),
+        "Customer": batch.customer_name,
+        "Email": batch.customer_email,
+      },
+    })
 
   for order in product_orders:
     item_summary = ", ".join(
