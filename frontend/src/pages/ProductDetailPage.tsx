@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/hooks/useAuth';
+import { useProductImages } from '@/hooks/useProductImages';
 import { equipmentData, servicesData } from '@/data/products';
 import { ArrowBigDown, ArrowBigUp, ArrowLeft, CreditCard, MessageCircleReply, ShoppingCart, Trash2 } from 'lucide-react';
 import { createProductReview, deleteProductReview, getProductReviews, replyToProductReview, voteProductReview } from '@/services/api';
@@ -17,6 +18,17 @@ export default function ProductDetailPage() {
   const { addToCart } = useCart();
   const { user } = useAuth();
   const [selectedImage, setSelectedImage] = useState(0);
+  
+  // Find product from both equipment and services
+  const product = [...equipmentData, ...servicesData].find((p) => p.id === id);
+  
+  // Load real images from backend image service
+  const { images: productImages } = useProductImages(
+    product?.name || '',
+    product?.category || 'equipment',
+    product?.images || []
+  );
+  
   const [reviews, setReviews] = useState<ProductReview[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(true);
   const [reviewsError, setReviewsError] = useState<string | null>(null);
@@ -35,8 +47,7 @@ export default function ProductDetailPage() {
   const [votePendingId, setVotePendingId] = useState<string | null>(null);
   const [deletePendingId, setDeletePendingId] = useState<string | null>(null);
 
-  // Find product from both equipment and services
-  const product = [...equipmentData, ...servicesData].find((p) => p.id === id);
+  // Use productImages if available, otherwise fall back to product.images
 
   if (!product) {
     return (
@@ -54,12 +65,14 @@ export default function ProductDetailPage() {
   }
 
   const handleAddToCart = () => {
-    addToCart(product);
+    addToCart(product, productImages[selectedImage] || product.images[selectedImage]);
   };
 
   const handleBuyNow = () => {
-    addToCart(product);
-    navigate('/cart');
+    const added = addToCart(product, productImages[selectedImage] || product.images[selectedImage]);
+    if (added) {
+      navigate('/cart');
+    }
   };
 
   const reviewsByParent = useMemo(() => {
@@ -371,29 +384,29 @@ export default function ProductDetailPage() {
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
         {/* Left Side - Images */}
         <div className="space-y-4">
-          <div className="aspect-square overflow-hidden rounded-[28px] border border-primary/15 bg-white shadow-[0_18px_50px_rgba(52,77,48,0.12)] flex items-center justify-center">
+          <div className="aspect-square overflow-hidden rounded-3xl border-2 border-primary/10 bg-gradient-to-br from-white via-gray-50 to-gray-100 shadow-lg flex items-center justify-center">
             <img
-              src={product.images[selectedImage]}
+              src={productImages[selectedImage] || product.images[selectedImage]}
               alt={product.name}
-              className="w-96 h-96 object-contain p-8"
+              className="w-full h-full object-cover"
             />
           </div>
-          {product.images.length > 1 && (
-            <div className="grid grid-cols-3 gap-4">
-              {product.images.map((image, index) => (
+          {productImages.length > 1 && (
+            <div className={`grid gap-4 ${productImages.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+              {productImages.map((image, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
-                  className={`aspect-square bg-gray-100 rounded-2xl overflow-hidden flex items-center justify-center border-2 transition-colors ${
+                  className={`aspect-square bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl overflow-hidden border-2 transition-all duration-200 ${
                     selectedImage === index
-                      ? 'border-primary shadow-lg shadow-primary/15'
-                      : 'border-transparent hover:border-gray-300'
+                      ? 'border-primary shadow-lg shadow-primary/30 scale-100'
+                      : 'border-gray-200 hover:border-primary/50 hover:shadow-md'
                   }`}
                 >
                   <img
                     src={image}
                     alt={`${product.name} ${index + 1}`}
-                    className="w-full h-full object-contain p-4"
+                    className="w-full h-full object-cover"
                   />
                 </button>
               ))}

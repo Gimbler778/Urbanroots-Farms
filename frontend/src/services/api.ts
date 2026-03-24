@@ -48,6 +48,13 @@ export const getProduct = async (id: string) => {
   return response.data
 }
 
+export const getProductImages = async (query: string, count = 2) => {
+  const response = await api.get<{ images: string[]; source: string }>('/images/search', {
+    params: { query, count },
+  })
+  return response.data
+}
+
 // Orders
 export const createOrder = async (orderData: Partial<Order>) => {
   const response = await api.post<Order>('/orders', orderData)

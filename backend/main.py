@@ -11,6 +11,7 @@ from app.api.routes import admin
 from app.api.routes import farmbot
 from app.api.routes import product_reviews
 from app.api.routes import cart
+from app.api.routes import images
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -48,6 +49,7 @@ app.include_router(product_reviews.router, prefix="/api", tags=["product-reviews
 app.include_router(cart.router, prefix="/api", tags=["cart"])
 app.include_router(admin.router, prefix="/api", tags=["admin"])
 app.include_router(farmbot.router, prefix="/api", tags=["farmbot"])
+app.include_router(images.router, prefix="/api", tags=["images"])
 
 @app.get("/")
 async def root():

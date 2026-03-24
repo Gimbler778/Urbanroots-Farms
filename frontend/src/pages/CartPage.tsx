@@ -1,16 +1,59 @@
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/hooks/useAuth';
+import { fetchProductImages } from '@/services/imageService';
 import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft } from 'lucide-react';
+
+function normalizeCartItemName(value: string): string {
+  return value
+    .replace(/\s+\d+$/, '')
+    .replace(/\s+Service$/i, '')
+    .trim();
+}
 
 export default function CartPage() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const { cart, removeFromCart, updateQuantity, clearCart, getCartTotal } = useCart();
+  const [cartImageById, setCartImageById] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (!cart.length) {
+      setCartImageById({});
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadCartImages = async () => {
+      const entries = await Promise.all(
+        cart.map(async (item) => {
+          const normalizedName = normalizeCartItemName(item.name);
+          const query = item.category === 'equipment'
+            ? `${normalizedName} agriculture equipment`
+            : `${normalizedName} agriculture service farming`;
+
+          const images = await fetchProductImages(query, 1);
+          return [item.id, images[0] || item.images[0]] as const;
+        }),
+      );
+
+      if (!cancelled) {
+        setCartImageById(Object.fromEntries(entries));
+      }
+    };
+
+    void loadCartImages();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [cart]);
 
   if (loading) {
     return (
@@ -97,19 +140,27 @@ export default function CartPage() {
               <CardContent className="p-6">
                 <div className="flex gap-4">
                   {/* Product Image */}
-                  <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Link
+                    to={`/products/${item.id}`}
+                    className="w-24 h-24 rounded-xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 border border-primary/10 flex-shrink-0 hover:ring-2 hover:ring-primary/30 transition"
+                  >
                     <img
-                      src={item.images[0]}
+                      src={cartImageById[item.id] || item.images[0]}
                       alt={item.name}
-                      className="w-16 h-16 object-contain"
+                      className="w-full h-full object-cover"
                     />
-                  </div>
+                  </Link>
 
                   {/* Product Details */}
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <h3 className="font-semibold text-lg truncate">{item.name}</h3>
+                        <Link
+                          to={`/products/${item.id}`}
+                          className="font-semibold text-lg truncate block hover:text-primary transition-colors"
+                        >
+                          {item.name}
+                        </Link>
                         <p className="text-sm text-muted-foreground">
                           {item.category === 'equipment' ? '🛠️ Equipment' : '⚙️ Service'}
                         </p>
