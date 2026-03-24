@@ -1,5 +1,9 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import List
+from pathlib import Path
+
+
+ENV_FILE_PATH = Path(__file__).resolve().parents[2] / ".env"
 
 
 class Settings(BaseSettings):
@@ -29,6 +33,9 @@ class Settings(BaseSettings):
     cloudflare_account_id: str = ""
     cloudflare_api_token: str = ""
 
+    # ---------------- PEXELS ---------------- #
+    pexels_api_key: str = ""
+
     # ---------------- CORS ---------------- #
     frontend_url: str = "http://localhost:3001"
     allowed_origins: str = (
@@ -43,7 +50,7 @@ class Settings(BaseSettings):
 
     # ---------------- CONFIG ---------------- #
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=str(ENV_FILE_PATH),
         env_file_encoding="utf-8",
         case_sensitive=False
     )

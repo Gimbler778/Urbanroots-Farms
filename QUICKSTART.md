@@ -173,7 +173,7 @@ ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 ## 💡 Tips
 
 - The frontend uses proxy configuration to avoid CORS issues in development
-- Sample products have placeholder images from Unsplash
+- Sample products have placeholder images from Pexels
 - Database is SQLite for easy development (switch to PostgreSQL for production)
 - All code is type-safe (TypeScript + Pydantic)
 - Hot reload is enabled for both frontend and backend

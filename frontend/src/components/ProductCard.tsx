@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Product } from '@/types/product';
 import { useCart } from '@/contexts/CartContext';
+import { useProductImages } from '@/hooks/useProductImages';
 
 interface ProductCardProps {
   product: Product;
@@ -10,22 +11,23 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
+  const { images } = useProductImages(product.name, product.category, product.images);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addToCart(product);
+    addToCart(product, images[0] || product.images[0]);
   };
 
   return (
     <Link to={`/products/${product.id}`} className="block">
-      <Card className="h-full hover:shadow-lg transition-shadow duration-300 cursor-pointer">
+      <Card className="h-full hover:shadow-md transition-all duration-300 cursor-pointer overflow-hidden group">
         <CardHeader className="p-0">
-          <div className="aspect-square overflow-hidden rounded-t-lg bg-gray-100 flex items-center justify-center">
+          <div className="aspect-video overflow-hidden rounded-t-xl bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center relative">
             <img
-              src={product.images[0]}
+              src={images[0] || product.images[0]}
               alt={product.name}
-              className="w-32 h-32 object-contain p-4"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
           </div>
         </CardHeader>

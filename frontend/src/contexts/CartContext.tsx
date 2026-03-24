@@ -5,7 +5,7 @@ import { clearUserCart, getUserCart, removeUserCartItem, updateUserCartItemQuant
 
 interface CartContextType {
   cart: CartItem[];
-  addToCart: (product: Product) => void;
+  addToCart: (product: Product, imageOverride?: string) => boolean;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
@@ -17,10 +17,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
-  const [cart, setCart] = useState<CartItem[]>(() => {
-    const savedCart = localStorage.getItem('urbanroots-cart');
-    return savedCart ? JSON.parse(savedCart) : [];
-  });
+  const [cart, setCart] = useState<CartItem[]>([]);
 
   const toPersisted = (item: CartItem) => ({
     product_id: item.id,
@@ -58,8 +55,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     if (!user) {
-      const savedCart = localStorage.getItem('urbanroots-cart');
-      setCart(savedCart ? JSON.parse(savedCart) : []);
+      localStorage.removeItem('urbanroots-cart');
+      setCart([]);
       return;
     }
 
@@ -75,44 +72,48 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     void loadServerCart();
   }, [user, loading]);
 
-  useEffect(() => {
+  const addToCart = (product: Product, imageOverride?: string) => {
     if (!user) {
-      localStorage.setItem('urbanroots-cart', JSON.stringify(cart));
+      window.alert('Please sign in to add to cart.');
+      return false;
     }
-  }, [cart, user]);
 
-  const addToCart = (product: Product) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((item) => item.id === product.id);
-      let nextCart: CartItem[];
-      let changedItem: CartItem;
 
       if (existingItem) {
-        nextCart = prevCart.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-        changedItem = nextCart.find((item) => item.id === product.id) as CartItem;
-      } else {
-        changedItem = { ...product, quantity: 1 };
-        nextCart = [...prevCart, changedItem];
+        return prevCart;
       }
 
-      if (user) {
-        void upsertUserCartItem(toPersisted(changedItem));
-      }
+      const normalizedImages = imageOverride
+        ? [imageOverride, ...product.images.filter((img) => img !== imageOverride)]
+        : product.images;
+
+      const changedItem = { ...product, images: normalizedImages, quantity: 1 };
+      const nextCart = [...prevCart, changedItem];
+
+      void upsertUserCartItem(toPersisted(changedItem));
 
       return nextCart;
     });
+
+    return true;
   };
 
   const removeFromCart = (productId: string) => {
-    if (user) {
-      void removeUserCartItem(productId);
+    if (!user) {
+      return;
     }
+
+    void removeUserCartItem(productId);
     setCart((prevCart) => prevCart.filter((item) => item.id !== productId));
   };
 
   const updateQuantity = (productId: string, quantity: number) => {
+    if (!user) {
+      return;
+    }
+
     if (quantity <= 0) {
       removeFromCart(productId);
       return;
@@ -122,18 +123,18 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         item.id === productId ? { ...item, quantity } : item
       );
 
-      if (user) {
-        void updateUserCartItemQuantity(productId, quantity);
-      }
+      void updateUserCartItemQuantity(productId, quantity);
 
       return nextCart;
     });
   };
 
   const clearCart = () => {
-    if (user) {
-      void clearUserCart();
+    if (!user) {
+      return;
     }
+
+    void clearUserCart();
     setCart([]);
   };
 
