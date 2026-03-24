@@ -62,10 +62,26 @@ export default function Footer() {
           <div>
             <h3 className="font-semibold text-lg mb-4">Services</h3>
             <ul className="space-y-2">
-              <li className="text-sm text-muted-foreground">Pod Details</li>
-              <li className="text-sm text-muted-foreground">Farming Services</li>
-              <li className="text-sm text-muted-foreground">Equipment Rental</li>
-              <li className="text-sm text-muted-foreground">Subscription Plans</li>
+              <li>
+                <Link to="/rent-a-pod#pod-details" className="text-sm text-muted-foreground hover:text-[hsl(var(--earth-brown))] transition-colors">
+                  Pod Details
+                </Link>
+              </li>
+              <li>
+                <Link to="/products?tab=services" className="text-sm text-muted-foreground hover:text-[hsl(var(--earth-brown))] transition-colors">
+                  Products-Service
+                </Link>
+              </li>
+              <li>
+                <Link to="/products?tab=equipment" className="text-sm text-muted-foreground hover:text-[hsl(var(--earth-brown))] transition-colors">
+                  Equipment
+                </Link>
+              </li>
+              <li>
+                <Link to="/rent-a-pod#pricing" className="text-sm text-muted-foreground hover:text-[hsl(var(--earth-brown))] transition-colors">
+                  Subscription Plans
+                </Link>
+              </li>
             </ul>
           </div>
 

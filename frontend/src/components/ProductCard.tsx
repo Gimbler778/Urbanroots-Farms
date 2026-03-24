@@ -12,6 +12,7 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
   const { images } = useProductImages(product.name, product.category, product.images);
+  const displayPrice = `₹${product.price.toLocaleString('en-IN')}`;
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -38,10 +39,10 @@ export function ProductCard({ product }: ProductCardProps) {
           </CardDescription>
           <div className="flex items-center justify-between">
             <span className="text-2xl font-bold text-primary">
-              ${product.price}
+              {displayPrice}
             </span>
             <span className="text-sm text-muted-foreground">
-              {product.category === 'equipment' ? '🛠️ Equipment' : '⚙️ Service'}
+              {product.category === 'equipment' ? 'Equipment' : 'Service'}
             </span>
           </div>
         </CardContent>

@@ -17,6 +17,22 @@ class OrderStatus(str, enum.Enum):
     CANCELLED = "cancelled"
 
 
+class ProductOrderBatchStatus(str, enum.Enum):
+    REQUESTED = "requested"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+    CONTACT_SCHEDULE = "contact_schedule"
+    PROCESSING = "processing"
+
+
+class ProductOrderBatchItemStatus(str, enum.Enum):
+    REQUESTED = "requested"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+    CONTACT_SCHEDULE = "contact_schedule"
+    PROCESSING = "processing"
+
+
 class Product(Base):
     __tablename__ = "products"
 
@@ -67,6 +83,44 @@ class OrderItem(Base):
     
     # Relationships
     order = relationship("Order", back_populates="items")
+    product = relationship("Product")
+
+
+class ProductOrderBatch(Base):
+    __tablename__ = "product_order_batches"
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    batch_ref = Column(String, nullable=False, unique=True, index=True)
+    user_id = Column(String, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
+    customer_name = Column(String, nullable=False)
+    customer_email = Column(String, nullable=False)
+    status = Column(Enum(ProductOrderBatchStatus), default=ProductOrderBatchStatus.REQUESTED, nullable=False)
+    subtotal = Column(Float, nullable=False)
+    tax = Column(Float, nullable=False, default=0.0)
+    total = Column(Float, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    items = relationship("ProductOrderBatchItem", back_populates="batch", cascade="all, delete-orphan")
+
+
+class ProductOrderBatchItem(Base):
+    __tablename__ = "product_order_batch_items"
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    batch_id = Column(String, ForeignKey("product_order_batches.id", ondelete="CASCADE"), nullable=False, index=True)
+    product_id = Column(String, ForeignKey("products.id"), nullable=False)
+    name = Column(String, nullable=False)
+    image = Column(String, nullable=False)
+    category = Column(String, nullable=False)
+    quantity = Column(Integer, nullable=False)
+    unit_price = Column(Float, nullable=False)
+    line_total = Column(Float, nullable=False)
+    status = Column(Enum(ProductOrderBatchItemStatus), default=ProductOrderBatchItemStatus.REQUESTED, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    batch = relationship("ProductOrderBatch", back_populates="items")
     product = relationship("Product")
 
 

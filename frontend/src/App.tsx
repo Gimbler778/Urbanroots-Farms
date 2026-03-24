@@ -20,6 +20,8 @@ import CartPage from './pages/CartPage'
 import ProfilePage from './pages/ProfilePage'
 import MyOrdersPage from './pages/MyOrdersPage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
+import AdminProductOrdersPage from './pages/AdminProductOrdersPage'
+import AdminCatalogPage from './pages/AdminCatalogPage'
 
 function App() {
   return (
@@ -46,6 +48,8 @@ function App() {
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/my-orders" element={<MyOrdersPage />} />
               <Route path="/admin" element={<AdminDashboardPage />} />
+              <Route path="/admin/product-orders" element={<AdminProductOrdersPage />} />
+              <Route path="/admin/catalog" element={<AdminCatalogPage />} />
             </Routes>
           </Router>
         </CartProvider>

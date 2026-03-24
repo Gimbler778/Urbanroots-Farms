@@ -7,7 +7,9 @@ import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/hooks/useAuth';
 import { fetchProductImages } from '@/services/imageService';
-import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft } from 'lucide-react';
+import { checkoutOrderBatch } from '@/services/api';
+import type { ProductOrderBatch } from '@/types';
+import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft, XCircle, BadgeCheck } from 'lucide-react';
 
 function normalizeCartItemName(value: string): string {
   return value
@@ -21,6 +23,107 @@ export default function CartPage() {
   const { user, loading } = useAuth();
   const { cart, removeFromCart, updateQuantity, clearCart, getCartTotal } = useCart();
   const [cartImageById, setCartImageById] = useState<Record<string, string>>({});
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState('');
+  const [checkoutSuccessBatch, setCheckoutSuccessBatch] = useState<ProductOrderBatch | null>(null);
+  const formatINR = (value: number) => `₹${value.toLocaleString('en-IN')}`;
+
+  const finalizeSuccessfulCheckout = (destination?: string) => {
+    clearCart();
+    setCheckoutSuccessBatch(null);
+    if (destination) {
+      navigate(destination);
+    }
+  };
+
+  const downloadInvoice = (batch: ProductOrderBatch) => {
+    const rows = batch.items
+      .map((item) => `
+        <tr>
+          <td style="padding:10px 12px;border-bottom:1px solid #e6e1d6;">${item.name}</td>
+          <td style="padding:10px 12px;border-bottom:1px solid #e6e1d6;text-align:center;">${item.quantity}</td>
+          <td style="padding:10px 12px;border-bottom:1px solid #e6e1d6;text-align:right;">₹${item.unit_price.toLocaleString('en-IN')}</td>
+          <td style="padding:10px 12px;border-bottom:1px solid #e6e1d6;text-align:right;">₹${item.line_total.toLocaleString('en-IN')}</td>
+        </tr>
+      `)
+      .join('');
+
+    const createdAt = new Date(batch.created_at).toLocaleString('en-IN');
+    const html = `
+      <!doctype html>
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>UrbanRoots Invoice ${batch.batch_ref}</title>
+        </head>
+        <body style="font-family:'Segoe UI',Arial,sans-serif;background:#f3f6ef;padding:24px;color:#253223;">
+          <div style="max-width:920px;margin:0 auto;background:#fff;border:1px solid #dbe6d2;border-radius:14px;overflow:hidden;">
+            <div style="background:linear-gradient(135deg,#3f7f3c,#74b267);padding:18px 24px;color:#fff;">
+              <h1 style="margin:0;font-size:28px;">UrbanRoots Invoice</h1>
+              <p style="margin:6px 0 0;opacity:.95;">Batch Reference: <strong>${batch.batch_ref}</strong></p>
+            </div>
+            <div style="padding:24px;">
+              <div style="display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+                <div>
+                  <div style="font-size:13px;color:#51644f;">Customer</div>
+                  <div style="font-size:18px;font-weight:700;">${batch.customer_name}</div>
+                  <div style="font-size:14px;color:#51644f;">${batch.customer_email}</div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-size:13px;color:#51644f;">Created At</div>
+                  <div style="font-size:15px;font-weight:600;">${createdAt}</div>
+                  <div style="font-size:13px;margin-top:6px;color:#51644f;">Status: <strong style="text-transform:capitalize;">${batch.status}</strong></div>
+                </div>
+              </div>
+
+              <table style="width:100%;border-collapse:collapse;margin-top:22px;font-size:14px;">
+                <thead style="background:#f0f7ec;">
+                  <tr>
+                    <th style="padding:10px 12px;text-align:left;">Product</th>
+                    <th style="padding:10px 12px;text-align:center;">Qty</th>
+                    <th style="padding:10px 12px;text-align:right;">Unit</th>
+                    <th style="padding:10px 12px;text-align:right;">Line Total</th>
+                  </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+              </table>
+
+              <div style="margin-top:18px;display:flex;justify-content:flex-end;">
+                <div style="min-width:280px;border:1px solid #dbe6d2;border-radius:10px;padding:12px;background:#fafdf8;">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span>Subtotal</span><strong>₹${batch.subtotal.toLocaleString('en-IN')}</strong></div>
+                  <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span>Tax</span><strong>₹${batch.tax.toLocaleString('en-IN')}</strong></div>
+                  <div style="display:flex;justify-content:space-between;font-size:18px;"><span>Total</span><strong>₹${batch.total.toLocaleString('en-IN')}</strong></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `UrbanRoots-Invoice-${batch.batch_ref}.html`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleCheckout = async () => {
+    setIsCheckingOut(true);
+    setCheckoutError('');
+    try {
+      const result = await checkoutOrderBatch();
+      setCheckoutSuccessBatch(result.batch);
+    } catch (requestError: any) {
+      setCheckoutError(requestError?.response?.data?.detail || 'Checkout failed. Please try again.');
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
 
   useEffect(() => {
     if (!cart.length) {
@@ -162,7 +265,7 @@ export default function CartPage() {
                           {item.name}
                         </Link>
                         <p className="text-sm text-muted-foreground">
-                          {item.category === 'equipment' ? '🛠️ Equipment' : '⚙️ Service'}
+                          {item.category === 'equipment' ? 'Equipment' : 'Service'}
                         </p>
                       </div>
                       <Button
@@ -204,10 +307,10 @@ export default function CartPage() {
                       {/* Price */}
                       <div className="text-right">
                         <div className="text-sm text-muted-foreground">
-                          ${item.price} each
+                          {formatINR(item.price)} each
                         </div>
                         <div className="text-lg font-bold text-primary">
-                          ${(item.price * item.quantity).toFixed(2)}
+                          {formatINR(item.price * item.quantity)}
                         </div>
                       </div>
                     </div>
@@ -240,7 +343,7 @@ export default function CartPage() {
                   <span className="text-muted-foreground">
                     Subtotal ({cart.reduce((sum, item) => sum + item.quantity, 0)} items)
                   </span>
-                  <span className="font-medium">${getCartTotal().toFixed(2)}</span>
+                  <span className="font-medium">{formatINR(getCartTotal())}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Shipping</span>
@@ -248,7 +351,7 @@ export default function CartPage() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Tax</span>
-                  <span className="font-medium">${(getCartTotal() * 0.08).toFixed(2)}</span>
+                  <span className="font-medium">{formatINR(getCartTotal() * 0.08)}</span>
                 </div>
               </div>
 
@@ -257,13 +360,13 @@ export default function CartPage() {
               <div className="flex justify-between text-lg font-bold">
                 <span>Total</span>
                 <span className="text-primary">
-                  ${(getCartTotal() * 1.08).toFixed(2)}
+                  {formatINR(getCartTotal() * 1.08)}
                 </span>
               </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-3">
-              <Button className="w-full" size="lg">
-                Proceed to Checkout
+              <Button className="w-full" size="lg" onClick={handleCheckout} disabled={isCheckingOut}>
+                {isCheckingOut ? 'Processing...' : 'Proceed to Checkout'}
               </Button>
               <Button
                 variant="outline"
@@ -277,6 +380,67 @@ export default function CartPage() {
         </div>
       </div>
     </div>
+
+    {checkoutError ? (
+      <div className="fixed inset-0 z-[150] flex items-center justify-center px-4">
+        <button
+          type="button"
+          className="absolute inset-0 bg-black/45 backdrop-blur-sm"
+          onClick={() => setCheckoutError('')}
+          aria-label="Close checkout error dialog"
+        />
+        <div className="relative z-10 w-full max-w-md rounded-3xl border border-red-200 bg-background/95 p-6 shadow-2xl">
+          <div className="flex items-center gap-3">
+            <XCircle className="h-6 w-6 text-red-600" />
+            <h3 className="text-2xl font-bold text-red-700">Checkout Failed</h3>
+          </div>
+          <p className="mt-3 text-sm text-muted-foreground">{checkoutError}</p>
+          <div className="mt-6 flex justify-end gap-3">
+            <Button variant="outline" onClick={() => setCheckoutError('')}>Close</Button>
+            <Button onClick={() => {
+              setCheckoutError('');
+              void handleCheckout();
+            }}>
+              Retry
+            </Button>
+          </div>
+        </div>
+      </div>
+    ) : null}
+
+    {checkoutSuccessBatch ? (
+      <div className="fixed inset-0 z-[150] flex items-center justify-center px-4">
+        <button
+          type="button"
+          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+          onClick={() => finalizeSuccessfulCheckout()}
+          aria-label="Close checkout success dialog"
+        />
+        <div className="relative z-10 w-full max-w-lg rounded-3xl border border-primary/20 bg-background/95 p-6 shadow-2xl">
+          <div className="flex items-center gap-3">
+            <BadgeCheck className="h-6 w-6 text-emerald-600" />
+            <h3 className="text-2xl font-bold text-primary">Order Batch Created</h3>
+          </div>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Your order is saved as batch <span className="font-semibold text-foreground">{checkoutSuccessBatch.batch_ref}</span>.
+            You can track item status and cancellations in My Orders. Your cart will be cleared once you continue.
+          </p>
+          <div className="mt-4 rounded-2xl border border-primary/10 bg-primary/5 p-4 text-sm">
+            <div className="flex justify-between"><span>Items</span><strong>{checkoutSuccessBatch.item_count}</strong></div>
+            <div className="mt-2 flex justify-between"><span>Total</span><strong>{formatINR(checkoutSuccessBatch.total)}</strong></div>
+          </div>
+          <div className="mt-6 flex flex-wrap justify-end gap-3">
+            <Button variant="outline" onClick={() => downloadInvoice(checkoutSuccessBatch)}>Download Invoice</Button>
+            <Button variant="outline" onClick={() => finalizeSuccessfulCheckout('/products')}>
+              Continue Shopping
+            </Button>
+            <Button onClick={() => finalizeSuccessfulCheckout('/my-orders')}>
+              View My Orders
+            </Button>
+          </div>
+        </div>
+      </div>
+    ) : null}
     </Layout>
   );
 }

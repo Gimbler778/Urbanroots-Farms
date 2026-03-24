@@ -13,6 +13,22 @@ class OrderStatus(str, Enum):
     CANCELLED = "cancelled"
 
 
+class ProductOrderBatchStatus(str, Enum):
+    REQUESTED = "requested"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+    CONTACT_SCHEDULE = "contact_schedule"
+    PROCESSING = "processing"
+
+
+class ProductOrderBatchItemStatus(str, Enum):
+    REQUESTED = "requested"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+    CONTACT_SCHEDULE = "contact_schedule"
+    PROCESSING = "processing"
+
+
 class PodRentalStatus(str, Enum):
     REQUESTED = "requested"
     CONTACT_SCHEDULED = "contact_scheduled"
@@ -126,6 +142,51 @@ class Order(OrderBase):
 
     class Config:
         from_attributes = True
+
+
+class ProductOrderBatchItem(BaseModel):
+    id: str
+    batch_id: str
+    product_id: str
+    name: str
+    image: str
+    category: str
+    quantity: int
+    unit_price: float
+    line_total: float
+    status: ProductOrderBatchItemStatus
+
+    class Config:
+        from_attributes = True
+
+
+class ProductOrderBatchSummary(BaseModel):
+    id: str
+    batch_ref: str
+    user_id: str
+    customer_name: str
+    customer_email: str
+    status: ProductOrderBatchStatus
+    subtotal: float
+    tax: float
+    total: float
+    item_count: int
+    created_at: datetime
+    updated_at: datetime
+    items: List[ProductOrderBatchItem]
+
+
+class ProductOrderBatchActionResponse(BaseModel):
+    message: str
+    batch: ProductOrderBatchSummary
+
+
+class ProductOrderBatchStatusUpdate(BaseModel):
+    status: ProductOrderBatchStatus
+
+
+class ProductOrderBatchItemStatusUpdate(BaseModel):
+    status: ProductOrderBatchItemStatus
 
 
 class PodRentalCreate(BaseModel):
@@ -333,6 +394,9 @@ class OrderHistoryItem(BaseModel):
     preferred_start_date: Optional[str] = None
     rental_term_months: Optional[int] = None
     item_count: Optional[int] = None
+    batch_ref: Optional[str] = None
+    can_cancel: Optional[bool] = None
+    product_items: List[ProductOrderBatchItem] = Field(default_factory=list)
     details: Dict[str, str]
 
 

@@ -46,6 +46,7 @@ export default function ProductDetailPage() {
   const [collapsedThreadById, setCollapsedThreadById] = useState<Record<string, boolean>>({});
   const [votePendingId, setVotePendingId] = useState<string | null>(null);
   const [deletePendingId, setDeletePendingId] = useState<string | null>(null);
+  const displayPrice = `₹${product?.price?.toLocaleString('en-IN') ?? '0'}`;
 
   // Use productImages if available, otherwise fall back to product.images
 
@@ -419,7 +420,7 @@ export default function ProductDetailPage() {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="text-sm px-3 py-1 bg-primary/10 text-primary rounded-full font-medium">
-                {product.category === 'equipment' ? '🛠️ Equipment' : '⚙️ Service'}
+                {product.category === 'equipment' ? 'Equipment' : 'Service'}
               </span>
             </div>
             <h1 className="text-4xl font-bold mb-2">{product.name}</h1>
@@ -427,7 +428,7 @@ export default function ProductDetailPage() {
               {product.description}
             </p>
             <div className="text-4xl font-bold text-primary mb-6">
-              ${product.price}
+              {displayPrice}
             </div>
           </div>
 
