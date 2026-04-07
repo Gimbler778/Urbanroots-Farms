@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -24,9 +24,6 @@ export default function ProductsPage() {
   const [servicesPage, setServicesPage] = useState(1);
   const [activeTab, setActiveTab] = useState<'equipment' | 'services'>(initialTab);
 
-  const equipmentGridRef = useRef<HTMLDivElement | null>(null);
-  const servicesGridRef = useRef<HTMLDivElement | null>(null);
-
   const equipmentTotalPages = Math.ceil(equipmentData.length / ITEMS_PER_PAGE);
   const servicesTotalPages = Math.ceil(servicesData.length / ITEMS_PER_PAGE);
 
@@ -43,27 +40,10 @@ export default function ProductsPage() {
     });
   };
 
-  const scrollToFirstCard = useCallback((tab: 'equipment' | 'services') => {
-    const el = tab === 'equipment' ? equipmentGridRef.current : servicesGridRef.current;
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-      scrollToTop();
-    }
-  }, []);
-
-  const handlePageChange = (
-    page: number,
-    setter: (page: number) => void,
-    tab: 'equipment' | 'services'
-  ) => {
+  const handlePageChange = (page: number, setter: (page: number) => void) => {
     setter(page);
-    requestAnimationFrame(() => scrollToFirstCard(tab));
+    scrollToTop();
   };
-
-  useEffect(() => {
-    requestAnimationFrame(() => scrollToFirstCard(activeTab));
-  }, [equipmentPage, servicesPage, activeTab, scrollToFirstCard]);
 
   useEffect(() => {
     const nextTab: 'equipment' | 'services' = requestedTab === 'services' ? 'services' : 'equipment';
@@ -128,6 +108,7 @@ export default function ProductsPage() {
           const nextTab = v as 'equipment' | 'services';
           setActiveTab(nextTab);
           setSearchParams({ tab: nextTab });
+          scrollToTop();
         }}
         className="w-full"
       >
@@ -148,16 +129,13 @@ export default function ProductsPage() {
             </p>
           </div>
 
-          <div
-            ref={equipmentGridRef}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6"
-          >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {getPaginatedProducts(equipmentData, equipmentPage).map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
 
-          {renderPagination(equipmentPage, equipmentTotalPages, (p) => handlePageChange(p, setEquipmentPage, 'equipment'))}
+          {renderPagination(equipmentPage, equipmentTotalPages, (p) => handlePageChange(p, setEquipmentPage))}
         </TabsContent>
 
         <TabsContent value="services" className="mt-6">
@@ -168,16 +146,13 @@ export default function ProductsPage() {
             </p>
           </div>
 
-          <div
-            ref={servicesGridRef}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6"
-          >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {getPaginatedProducts(servicesData, servicesPage).map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
 
-          {renderPagination(servicesPage, servicesTotalPages, (p) => handlePageChange(p, setServicesPage, 'services'))}
+          {renderPagination(servicesPage, servicesTotalPages, (p) => handlePageChange(p, setServicesPage))}
         </TabsContent>
       </Tabs>
     </div>

@@ -237,6 +237,11 @@ export interface ProductOrderBatchActionResponse {
   batch: ProductOrderBatch
 }
 
+export interface CheckoutOrderBatchPayload {
+  coupon_code?: string
+  referral_code?: string
+}
+
 export interface Address {
   fullName: string
   street: string
