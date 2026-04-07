@@ -8,14 +8,14 @@ import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useProductImages } from '@/hooks/useProductImages';
 import { equipmentData, servicesData } from '@/data/products';
-import { ArrowBigDown, ArrowBigUp, ArrowLeft, CreditCard, MessageCircleReply, ShoppingCart, Trash2 } from 'lucide-react';
+import { ArrowBigDown, ArrowBigUp, ArrowLeft, CreditCard, MessageCircleReply, Minus, Plus, ShoppingCart, Trash2 } from 'lucide-react';
 import { createProductReview, deleteProductReview, getProductReviews, replyToProductReview, voteProductReview } from '@/services/api';
 import type { ProductReview } from '@/types';
 
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { cart, addToCart, updateQuantity } = useCart();
   const { user } = useAuth();
   const [selectedImage, setSelectedImage] = useState(0);
   
@@ -47,6 +47,7 @@ export default function ProductDetailPage() {
   const [votePendingId, setVotePendingId] = useState<string | null>(null);
   const [deletePendingId, setDeletePendingId] = useState<string | null>(null);
   const displayPrice = `₹${product?.price?.toLocaleString('en-IN') ?? '0'}`;
+  const currentQuantity = product ? (cart.find((item) => item.id === product.id)?.quantity ?? 0) : 0;
 
   // Use productImages if available, otherwise fall back to product.images
 
@@ -476,15 +477,37 @@ export default function ProductDetailPage() {
 
           {/* Action Buttons */}
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Button
-              onClick={handleAddToCart}
-              variant="outline"
-              size="lg"
-              className="flex-1"
-            >
-              <ShoppingCart className="mr-2 h-5 w-5" />
-              Add to Cart
-            </Button>
+            {currentQuantity > 0 ? (
+              <div className="flex flex-1 items-center justify-between rounded-lg border px-3 py-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => updateQuantity(product.id, currentQuantity - 1)}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <span className="text-sm font-semibold">In cart: {currentQuantity}</span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => updateQuantity(product.id, currentQuantity + 1)}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <Button
+                onClick={handleAddToCart}
+                variant="outline"
+                size="lg"
+                className="flex-1"
+              >
+                <ShoppingCart className="mr-2 h-5 w-5" />
+                Add to Cart
+              </Button>
+            )}
             <Button onClick={handleBuyNow} size="lg" className="flex-1">
               <CreditCard className="mr-2 h-5 w-5" />
               Buy Now

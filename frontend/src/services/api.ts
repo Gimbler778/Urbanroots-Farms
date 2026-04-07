@@ -23,6 +23,7 @@ import type {
   PersistedCartItem,
   ProductOrderBatchActionResponse,
   ProductOrderBatch,
+  CheckoutOrderBatchPayload,
   AdminDashboardData,
   BuildingApplicationStatus,
   PodRentalStatus,
@@ -73,8 +74,8 @@ export const getOrder = async (id: string) => {
   return response.data
 }
 
-export const checkoutOrderBatch = async () => {
-  const response = await api.post<ProductOrderBatchActionResponse>('/orders/batches/checkout')
+export const checkoutOrderBatch = async (payload?: CheckoutOrderBatchPayload) => {
+  const response = await api.post<ProductOrderBatchActionResponse>('/orders/batches/checkout', payload)
   return response.data
 }
 

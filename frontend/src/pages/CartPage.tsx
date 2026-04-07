@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/hooks/useAuth';
@@ -18,6 +19,15 @@ function normalizeCartItemName(value: string): string {
     .trim();
 }
 
+const TAX_RATE = 0.08;
+const REFERRAL_DISCOUNT_RATE = 0.05;
+const MAX_COMBINED_DISCOUNT_RATE = 0.3;
+const COUPON_DISCOUNT_BY_CODE: Record<string, number> = {
+  WELCOME5: 0.05,
+  URBAN10: 0.1,
+  HARVEST15: 0.15,
+};
+
 export default function CartPage() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
@@ -26,14 +36,65 @@ export default function CartPage() {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
   const [checkoutSuccessBatch, setCheckoutSuccessBatch] = useState<ProductOrderBatch | null>(null);
+  const [couponInput, setCouponInput] = useState('');
+  const [referralInput, setReferralInput] = useState('');
+  const [appliedCouponCode, setAppliedCouponCode] = useState<string>('');
+  const [appliedReferralCode, setAppliedReferralCode] = useState<string>('');
+  const [discountMessage, setDiscountMessage] = useState('');
   const formatINR = (value: number) => `₹${value.toLocaleString('en-IN')}`;
+
+  const subtotal = getCartTotal();
+  const couponRate = appliedCouponCode ? (COUPON_DISCOUNT_BY_CODE[appliedCouponCode] ?? 0) : 0;
+  const referralRate = appliedReferralCode ? REFERRAL_DISCOUNT_RATE : 0;
+  const discountRate = Math.min(couponRate + referralRate, MAX_COMBINED_DISCOUNT_RATE);
+  const discountAmount = Number((subtotal * discountRate).toFixed(2));
+  const discountedSubtotal = Number(Math.max(subtotal - discountAmount, 0).toFixed(2));
+  const taxAmount = Number((discountedSubtotal * TAX_RATE).toFixed(2));
+  const totalAmount = Number((discountedSubtotal + taxAmount).toFixed(2));
 
   const finalizeSuccessfulCheckout = (destination?: string) => {
     clearCart();
     setCheckoutSuccessBatch(null);
+    setCouponInput('');
+    setReferralInput('');
+    setAppliedCouponCode('');
+    setAppliedReferralCode('');
+    setDiscountMessage('');
     if (destination) {
       navigate(destination);
     }
+  };
+
+  const applyCouponCode = () => {
+    const normalized = couponInput.trim().toUpperCase();
+    if (!normalized) {
+      setDiscountMessage('Enter a coupon code before applying.');
+      return;
+    }
+
+    if (!COUPON_DISCOUNT_BY_CODE[normalized]) {
+      setDiscountMessage('Invalid coupon code. Try WELCOME5, URBAN10, or HARVEST15.');
+      return;
+    }
+
+    setAppliedCouponCode(normalized);
+    setDiscountMessage(`Coupon ${normalized} applied.`);
+  };
+
+  const applyReferralCode = () => {
+    const normalized = referralInput.trim().toUpperCase();
+    if (!normalized) {
+      setDiscountMessage('Enter a referral code before applying.');
+      return;
+    }
+
+    if (normalized.length < 4) {
+      setDiscountMessage('Referral code must be at least 4 characters.');
+      return;
+    }
+
+    setAppliedReferralCode(normalized);
+    setDiscountMessage(`Referral code ${normalized} applied.`);
   };
 
   const downloadInvoice = (batch: ProductOrderBatch) => {
@@ -116,8 +177,21 @@ export default function CartPage() {
     setIsCheckingOut(true);
     setCheckoutError('');
     try {
-      const result = await checkoutOrderBatch();
-      setCheckoutSuccessBatch(result.batch);
+      const result = await checkoutOrderBatch({
+        coupon_code: appliedCouponCode || undefined,
+        referral_code: appliedReferralCode || undefined,
+      });
+
+      const batchWithAppliedDiscount = discountAmount > 0
+        ? {
+            ...result.batch,
+            subtotal: discountedSubtotal,
+            tax: taxAmount,
+            total: totalAmount,
+          }
+        : result.batch;
+
+      setCheckoutSuccessBatch(batchWithAppliedDiscount);
     } catch (requestError: any) {
       setCheckoutError(requestError?.response?.data?.detail || 'Checkout failed. Please try again.');
     } finally {
@@ -338,20 +412,79 @@ export default function CartPage() {
               <CardTitle>Order Summary</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="space-y-3 rounded-xl border border-primary/15 bg-primary/5 p-3">
+                <p className="text-sm font-medium">Apply discounts</p>
+                <div className="flex gap-2">
+                  <Input
+                    value={couponInput}
+                    onChange={(event) => setCouponInput(event.target.value)}
+                    placeholder="Coupon code"
+                    className="h-9"
+                  />
+                  <Button type="button" variant="outline" className="h-9" onClick={applyCouponCode}>
+                    Apply
+                  </Button>
+                </div>
+                {appliedCouponCode ? (
+                  <div className="flex items-center justify-between text-xs text-primary">
+                    <span>Coupon active: {appliedCouponCode}</span>
+                    <button
+                      type="button"
+                      className="font-medium underline"
+                      onClick={() => setAppliedCouponCode('')}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : null}
+
+                <div className="flex gap-2">
+                  <Input
+                    value={referralInput}
+                    onChange={(event) => setReferralInput(event.target.value)}
+                    placeholder="Referral code"
+                    className="h-9"
+                  />
+                  <Button type="button" variant="outline" className="h-9" onClick={applyReferralCode}>
+                    Apply
+                  </Button>
+                </div>
+                {appliedReferralCode ? (
+                  <div className="flex items-center justify-between text-xs text-primary">
+                    <span>Referral active: {appliedReferralCode}</span>
+                    <button
+                      type="button"
+                      className="font-medium underline"
+                      onClick={() => setAppliedReferralCode('')}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : null}
+
+                {discountMessage ? <p className="text-xs text-muted-foreground">{discountMessage}</p> : null}
+              </div>
+
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">
                     Subtotal ({cart.reduce((sum, item) => sum + item.quantity, 0)} items)
                   </span>
-                  <span className="font-medium">{formatINR(getCartTotal())}</span>
+                  <span className="font-medium">{formatINR(subtotal)}</span>
                 </div>
+                {discountAmount > 0 ? (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Discount</span>
+                    <span className="font-medium text-green-600">-{formatINR(discountAmount)}</span>
+                  </div>
+                ) : null}
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Shipping</span>
                   <span className="font-medium text-green-600">FREE</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Tax</span>
-                  <span className="font-medium">{formatINR(getCartTotal() * 0.08)}</span>
+                  <span className="font-medium">{formatINR(taxAmount)}</span>
                 </div>
               </div>
 
@@ -360,7 +493,7 @@ export default function CartPage() {
               <div className="flex justify-between text-lg font-bold">
                 <span>Total</span>
                 <span className="text-primary">
-                  {formatINR(getCartTotal() * 1.08)}
+                  {formatINR(totalAmount)}
                 </span>
               </div>
             </CardContent>

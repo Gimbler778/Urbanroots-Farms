@@ -82,7 +82,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const existingItem = prevCart.find((item) => item.id === product.id);
 
       if (existingItem) {
-        return prevCart;
+        const nextQuantity = existingItem.quantity + 1;
+        void updateUserCartItemQuantity(existingItem.id, nextQuantity);
+
+        return prevCart.map((item) =>
+          item.id === existingItem.id ? { ...item, quantity: nextQuantity } : item,
+        );
       }
 
       const normalizedImages = imageOverride

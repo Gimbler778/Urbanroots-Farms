@@ -4,15 +4,18 @@ import { Button } from '@/components/ui/button';
 import { Product } from '@/types/product';
 import { useCart } from '@/contexts/CartContext';
 import { useProductImages } from '@/hooks/useProductImages';
+import { Minus, Plus } from 'lucide-react';
 
 interface ProductCardProps {
   product: Product;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const { addToCart } = useCart();
+  const { cart, addToCart, updateQuantity } = useCart();
   const { images } = useProductImages(product.name, product.category, product.images);
   const displayPrice = `₹${product.price.toLocaleString('en-IN')}`;
+  const cartItem = cart.find((item) => item.id === product.id);
+  const currentQuantity = cartItem?.quantity ?? 0;
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -47,13 +50,43 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
         </CardContent>
         <CardFooter className="p-4 pt-0">
-          <Button 
-            onClick={handleAddToCart} 
-            className="w-full"
-            variant="default"
-          >
-            Add to Cart
-          </Button>
+          {currentQuantity > 0 ? (
+            <div
+              className="flex w-full items-center justify-between rounded-md border bg-muted/30 px-2 py-1"
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+              }}
+            >
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => updateQuantity(product.id, currentQuantity - 1)}
+              >
+                <Minus className="h-3 w-3" />
+              </Button>
+              <span className="text-sm font-semibold">Qty: {currentQuantity}</span>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => updateQuantity(product.id, currentQuantity + 1)}
+              >
+                <Plus className="h-3 w-3" />
+              </Button>
+            </div>
+          ) : (
+            <Button
+              onClick={handleAddToCart}
+              className="w-full"
+              variant="default"
+            >
+              Add to Cart
+            </Button>
+          )}
         </CardFooter>
       </Card>
     </Link>
